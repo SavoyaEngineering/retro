@@ -1,0 +1,11 @@
+<div class="jumbotron">
+  <h2>Select a retro room</h2>
+</div>
+
+<div>
+  <ul class="list-group">
+  <%= for room <- rooms() do %>
+    <li class="list-group-item text-center"><%= room.name %></li>
+  <% end %>
+  </ul>
+</div>

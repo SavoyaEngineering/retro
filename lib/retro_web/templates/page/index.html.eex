@@ -1,0 +1,4 @@
+<div class="jumbotron">
+  <h2><%= gettext "%{name}", name: "Start or join a retro" %></h2>
+  <a class="btn btn-primary" href="/rooms"> Join </a>
+</div>
