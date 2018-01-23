@@ -18,7 +18,7 @@ Clone the repo and move to the directory and setup the app/ db.
 ```apple js
 mix deps.get
 mix ecto.create
-mix exto.migrate
+mix ecto.migrate
 cd assets && npm install
 ```
 https://hexdocs.pm/phoenix/up_and_running.html
