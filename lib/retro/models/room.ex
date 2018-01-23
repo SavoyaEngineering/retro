@@ -10,13 +10,14 @@ defmodule Retro.Room do
   end
 
   @doc false
-  def changeset(%Room{} = room, attrs) do
+  def changeset(%Room{} = room, attrs \\ %{}) do
     room
     |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> validate_required([:name], message: "Name required")
   end
 
   def create(%Room{} = room) do
-    Repo.insert(room)
+    validated_room =  changeset(room)
+    Repo.insert(validated_room)
   end
 end

@@ -20,4 +20,10 @@ defmodule RetroWeb.RoomViewTest do
       assert result === expected
     end
   end
+
+  describe "RoomView.readable_error/1" do
+    test "it returns the error message" do
+      assert RoomView.readable_error({:error, {"readable error", "other thing"}}) === "readable error"
+    end
+  end
 end

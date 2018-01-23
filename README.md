@@ -46,7 +46,7 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
 ## App console
 To get into repl with the app loaded, run;
 ```apple js
-alias Retro.{Repo, Room}
+iex -S mix
 ```
 
 ## Learn more
