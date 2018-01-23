@@ -1,0 +1,3 @@
+<div class="jumbotron">
+    <h2><%= @room.name %></h2>
+</div>

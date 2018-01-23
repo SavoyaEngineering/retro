@@ -19,7 +19,8 @@ defmodule RetroWeb.RoomView do
   defp encode(room) do
     %{
       id: room.id,
-      name: room.name
+      name: room.name,
+      password_required: room.password_hash != nil
     }
   end
 end

@@ -3,9 +3,24 @@
 </div>
 
 <div>
-  <ul class="list-group">
-  <%= for room <- rooms() do %>
-    <li class="list-group-item text-center"><%= room.name %></li>
-  <% end %>
-  </ul>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Retro</th>
+        <th scope="col">Password (if required)</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for room <- rooms() do %>
+        <tr>
+
+          <th><%= room.name %></th>
+          <th><%= text_input f, :password, class: "form-control", id: "roomPassword", type: "passwword", placeholder: "password"%></th>
+          <th><%= link "Go to Retro", to: room_path(@conn, :show, room.id), class: "btn btn-primary" %></th>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>

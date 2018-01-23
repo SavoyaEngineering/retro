@@ -5,19 +5,36 @@ defmodule Retro.Room do
 
   schema "rooms" do
     field :name, :string
+    field :password, :string, virtual: true
+    field :password_hash, :string
 
     timestamps()
   end
 
-  @doc false
   def changeset(%Room{} = room, attrs \\ %{}) do
     room
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:name, :password])
     |> validate_required([:name], message: "Name required")
+    |> hash_password()
   end
 
-  def create(%Room{} = room) do
-    validated_room =  changeset(room)
-    Repo.insert(validated_room)
+  def create(%{} = change) do
+    changeset(%Room{}, change)
+    |> Repo.insert
+  end
+
+  defp hash_password(
+         %Ecto.Changeset{
+           valid?: true,
+           changes: %{
+             password: password
+           }
+         } = changeset
+       ) do
+    change(changeset, password_hash: Comeonin.Argon2.hashpwsalt(password))
+  end
+
+  defp hash_password(changeset) do
+    changeset
   end
 end
