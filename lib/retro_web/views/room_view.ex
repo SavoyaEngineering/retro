@@ -8,12 +8,14 @@ defmodule RetroWeb.RoomView do
     |> Enum.map(fn (room) -> encode(room) end)
   end
 
-  def changeset do
-    Room.changeset(%Room{})
+  def room_changeset(room) do
+    %Room{name: room.name}
+    |> Room.changeset
   end
 
   def readable_error(error) do
-    elem(error, 1) |> elem(0)
+    elem(error, 1)
+    |> elem(0)
   end
 
   defp encode(room) do

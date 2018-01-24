@@ -54,3 +54,7 @@ config :retro, Retro.Repo,
   database: "retro_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :retro, RetroWeb.Guardian,
+       issuer: "retro",
+       secret_key: "secret"

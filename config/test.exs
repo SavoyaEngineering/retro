@@ -15,3 +15,7 @@ config :retro, Retro.Repo,
   database: "retro_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :retro, RetroWeb.Guardian,
+       issuer: "retro",
+       secret_key: "secret"

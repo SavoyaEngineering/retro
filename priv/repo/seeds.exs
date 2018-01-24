@@ -9,6 +9,6 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
-Retro.Repo.insert!(%Retro.Room{name: "Dev Retro"})
-Retro.Repo.insert!(%Retro.Room{name: "Accounting Retro"})
-Retro.Repo.insert!(%Retro.Room{name: "All hands Retro"})
+Retro.Repo.insert!(%Retro.Room{name: "Dev Retro", password: "bethcatlover"})
+Retro.Repo.insert!(%Retro.Room{name: "Accounting Retro", password: "bethcatlover"})
+Retro.Repo.insert!(%Retro.Room{name: "All hands Retro", password: "bethcatlover"})
