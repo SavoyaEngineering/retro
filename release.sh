@@ -7,4 +7,4 @@ node node_modules/brunch/bin/brunch build --production
 cd ..
 mix phx.digest
 
-MIX_ENV=prod mix release
+MIX_ENV=prod mix release --env=prod
