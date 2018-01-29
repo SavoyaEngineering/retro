@@ -1,8 +1,8 @@
-defmodule RetroWeb.UserSocket do
+defmodule RetroWeb.RoomSocket do
   use Phoenix.Socket
 
-  ## Channels
-  # channel "room:*", RetroWeb.RoomChannel
+  # Channels
+   channel "room:*", RetroWeb.RoomChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -19,8 +19,14 @@ defmodule RetroWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(%{"token" => token}, socket) do
+    # max_age: 1209600 is equivalent to two weeks in seconds
+    case Phoenix.Token.verify(socket, "room socket", token, max_age: 1209600) do
+      {:ok, room_id} ->
+        {:ok, assign(socket, :current_user, room_id)}
+      {:error, reason} ->
+        :error
+    end
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

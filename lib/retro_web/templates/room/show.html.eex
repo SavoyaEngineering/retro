@@ -1,3 +1,29 @@
 <div class="jumbotron">
     <h2><%= @room.name %></h2>
 </div>
+<div class="retro-wrapper">
+    <div class="retro-column" id="happy-column">
+        <h2 class="text-center"> Happy </h2>
+        <input id="happy-input" type="text" class="form-control">
+        <%= for item <- @happy_items do %>
+            <li class="thumbnail"><%= item.text %></li>
+        <% end %>
+    </div>
+    <div class="retro-column" id="middle-column">
+        <h2 class="text-center"> Meh </h2>
+        <input id="middle-input" type="text" class="form-control">
+         <%= for item <- @middle_items do %>
+            <li class="thumbnail"><%= item.text %></li>
+        <% end %>
+    </div>
+    <div class="retro-column" id="sad-column">
+        <h2 class="text-center"> Sad </h2>
+        <input id="sad-input" type="text" class="form-control">
+        <%= for item <- @sad_items do %>
+            <li class="thumbnail"><%= item.text %></li>
+        <% end %>
+    </div>
+</div>
+  <div id="rooms"></div>
+<script>window.roomToken = "<%= assigns[:room_token] %>";</script>
+<script>window.roomId = "<%= @room.id %>";</script>

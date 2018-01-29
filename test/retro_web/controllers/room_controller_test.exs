@@ -2,7 +2,7 @@ defmodule RetroWeb.RetroControllerTest do
   use RetroWeb.ConnCase
   import Ecto.Query, only: [from: 2]
 
-  alias Retro.{Repo, Room}
+  alias Retro.{Repo, Room, Item}
 
   describe "GET /rooms" do
     test "renders room/index.html", %{conn: conn} do
@@ -83,6 +83,9 @@ defmodule RetroWeb.RetroControllerTest do
   describe "GET /rooms/:id" do
     test "it lets someone who is logged into the room view the room" do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+
+      Item.create(%{room_id: room.id, type: "happy_msg", text: "JH - foosball table"})
+
       #setup the connection signed into that room
       conn = build_conn()
              |> RetroWeb.Guardian.Plug.sign_in(room)
@@ -91,7 +94,9 @@ defmodule RetroWeb.RetroControllerTest do
       conn = get conn, "rooms/#{room.id}"
 
 
-      assert html_response(conn, 200) =~ "Dev Retro"
+      response = html_response(conn, 200)
+      assert response =~ "Dev Retro"
+      assert response =~ "JH - foosball table"
     end
 
     test "it redirects to index when someone who is not logged into the room visits" do

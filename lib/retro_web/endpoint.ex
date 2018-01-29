@@ -1,7 +1,7 @@
 defmodule RetroWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :retro
 
-  socket "/socket", RetroWeb.UserSocket
+  socket "/socket", RetroWeb.RoomSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #

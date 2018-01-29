@@ -23,6 +23,16 @@ defmodule RetroWeb.Router do
                                  error_handler: RetroWeb.AuthErrorHandler
     plug Guardian.Plug.VerifySession
     plug Guardian.Plug.LoadResource
+    plug :put_room_token
+  end
+
+  defp put_room_token(conn, _) do
+    if current_room_id = conn.private.guardian_default_resource[:id] do
+      token = Phoenix.Token.sign(conn, "room socket", current_room_id)
+      assign(conn, :room_token, token)
+    else
+      conn
+    end
   end
 
 

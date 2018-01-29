@@ -2,8 +2,9 @@ defmodule RetroWeb.RoomController do
   use RetroWeb, :controller
 
   import Comeonin.Argon2, only: [checkpw: 2, dummy_checkpw: 0]
+  import Ecto.Query, only: [from: 2]
 
-  alias Retro.{Repo, Room}
+  alias Retro.{Repo, Room, Item}
   alias RetroWeb.Guardian
 
   def index(conn, _params) do
@@ -65,6 +66,9 @@ defmodule RetroWeb.RoomController do
       if id == authenticated_room_id  do
         conn
         |> assign(:room, room)
+        |> assign(:happy_items, items_for_room(room, "happy_msg"))
+        |> assign(:middle_items, items_for_room(room, "middle_msg"))
+        |> assign(:sad_items, items_for_room(room, "sad_msg"))
         |> render("show.html")
       else
         room_not_found(conn)
@@ -83,5 +87,9 @@ defmodule RetroWeb.RoomController do
     conn
     |> put_flash(:error, "Retro not found")
     |> redirect(to: "/rooms")
+  end
+
+  defp items_for_room(room, item_type) do
+    from(item in Item, where: item.type == ^item_type, where: item.room_id == ^room.id, order_by: item.inserted_at) |> Repo.all()
   end
 end

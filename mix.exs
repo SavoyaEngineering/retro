@@ -44,7 +44,8 @@ defmodule Retro.Mixfile do
       {:distillery, "~> 1.5", runtime: false},
       {:comeonin, "~> 4.0"},
       {:argon2_elixir, "~> 1.2"},
-      {:guardian, "~> 1.0"}
+      {:guardian, "~> 1.0"},
+      {:ecto_enum, "~> 1.0"}
     ]
   end
 

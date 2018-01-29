@@ -1,1 +1,7 @@
 /* This file is for your main application css. */
+
+.retro-column {
+    float: left;
+    width: 33.33%;
+    padding: 1em;
+}
