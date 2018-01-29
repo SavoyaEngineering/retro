@@ -10,3 +10,4 @@
 #MIX_ENV=prod mix release --env=prod
 
 git push gigalixir master -f
+gigalixir migrate $APP_NAME
