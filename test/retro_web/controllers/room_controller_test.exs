@@ -84,7 +84,8 @@ defmodule RetroWeb.RetroControllerTest do
     test "it lets someone who is logged into the room view the room" do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
-      Item.create(%{room_id: room.id, type: "happy_msg", text: "JH - foosball table"})
+      Item.create(%{room_id: room.id, type: "happy_msg", text: "JH - foosball table", archived: false})
+      Item.create(%{room_id: room.id, type: "happy_msg", text: "JH - archived", archived: true})
 
       #setup the connection signed into that room
       conn = build_conn()
@@ -97,6 +98,7 @@ defmodule RetroWeb.RetroControllerTest do
       response = html_response(conn, 200)
       assert response =~ "Dev Retro"
       assert response =~ "JH - foosball table"
+      assert (response =~ "JH - archived") === false
     end
 
     test "it redirects to index when someone who is not logged into the room visits" do

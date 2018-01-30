@@ -7,13 +7,14 @@ defmodule Retro.Item do
     field :text, :string
     field :type, :string
     field :room_id, :integer
+    field :archived, :boolean
 
     timestamps()
   end
 
   def changeset(%Item{} = item, attrs \\ %{}) do
     item
-    |> cast(attrs, [:text, :type, :room_id])
+    |> cast(attrs, [:text, :type, :room_id, :archived])
     |> validate_required([:room_id], message: "Room ID required")
     |> validate_required([:text], message: "Text required")
     |> validate_required([:type], message: "Type required")
@@ -22,5 +23,10 @@ defmodule Retro.Item do
   def create(%{} = change) do
     changeset(%Item{}, change)
     |> Repo.insert
+  end
+
+  def archive(%Item{} = item) do
+    changeset(item, %{archived: true})
+      |> Repo.update
   end
 end

@@ -27,4 +27,17 @@ defmodule Retro.ItemTest do
       assert (Repo.all(Item) |> Enum.count) === 0
     end
   end
+
+  describe "Item.archive/1" do
+    test "archives a given item" do
+      {:ok, item} = Item.create(%{text: "JH: New retro app.", type: "happy_msg", room_id: 12, archived: false})
+
+
+      Item.archive(item)
+
+
+      updated_item = Repo.get(Item, item.id)
+      assert updated_item.archived === true
+    end
+  end
 end

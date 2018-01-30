@@ -1,26 +1,35 @@
 <div class="jumbotron">
     <h2><%= @room.name %></h2>
 </div>
-<div class="retro-wrapper">
-    <div class="retro-column" id="happy-column">
+<div id="retro-wrapper">
+    <div class="retro-column form-group" id="happy-column">
         <h2 class="text-center"> Happy </h2>
-        <input id="happy-input" type="text" class="form-control">
+        <div class="form-group">
+            <input id="happy-input" type="text" class="form-control" placeholder="New Item">
+        </div>
+        <hr>
         <%= for item <- @happy_items do %>
-            <li class="thumbnail"><%= item.text %></li>
+            <li class="thumbnail" id="item-<%= item.id %>"><%= item.text %></li>
         <% end %>
     </div>
     <div class="retro-column" id="middle-column">
         <h2 class="text-center"> Meh </h2>
-        <input id="middle-input" type="text" class="form-control">
+        <div class="form-group">
+            <input id="middle-input" type="text" class="form-control" placeholder="New Item">
+        </div>
+        <hr>
          <%= for item <- @middle_items do %>
-            <li class="thumbnail"><%= item.text %></li>
+            <li class="thumbnail" id="item-<%= item.id %>"><%= item.text %></li>
         <% end %>
     </div>
     <div class="retro-column" id="sad-column">
         <h2 class="text-center"> Sad </h2>
-        <input id="sad-input" type="text" class="form-control">
+        <div class="form-group">
+            <input id="sad-input" type="text" class="form-control" placeholder="New Item">
+        </div>
+        <hr>
         <%= for item <- @sad_items do %>
-            <li class="thumbnail"><%= item.text %></li>
+            <li class="thumbnail" id="item-<%= item.id %>"><%= item.text %> </li>
         <% end %>
     </div>
 </div>

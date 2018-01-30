@@ -90,6 +90,13 @@ defmodule RetroWeb.RoomController do
   end
 
   defp items_for_room(room, item_type) do
-    from(item in Item, where: item.type == ^item_type, where: item.room_id == ^room.id, order_by: item.inserted_at) |> Repo.all()
+    from(
+      item in Item,
+      where: item.type == ^item_type,
+      where: item.room_id == ^room.id,
+      where: item.archived == false,
+      order_by: item.inserted_at
+    )
+    |> Repo.all()
   end
 end
