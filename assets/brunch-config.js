@@ -37,7 +37,7 @@ exports.config = {
   // Phoenix paths configuration
   paths: {
     // Dependencies and current project directories to watch
-    watched: ["static", "css", "js", "vendor"],
+    watched: ["static", "css", "js", "vendor", "../lib/retro_web/elm"],
     // Where to compile files to
     public: "../priv/static"
   },
@@ -47,6 +47,30 @@ exports.config = {
     babel: {
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/]
+    },
+    elmBrunch: {
+      // (required) Set to the elm file(s) containing your "main" function `elm make`
+      //            handles all elm dependencies relative to `elmFolder`
+      mainModules: ['Main.elm'],
+
+      // (optional) Set to path where `elm-make` is located, relative to `elmFolder`
+      // executablePath: '../../node_modules/elm/binwrappers',
+
+      // (optional) Set to path where elm-package.json is located, defaults to project root
+      //            if your elm files are not in /app then make sure to configure
+      //            paths.watched in main brunch config
+      elmFolder: '../lib/retro_web/elm',
+
+      // (optional) Defaults to 'js/' folder in paths.public
+      // relative to `elmFolder`
+      outputFolder: '../../../assets/js/',
+
+      // (optional) If specified, all mainModules will be compiled to a single file
+      //            This is merged with outputFolder.
+      outputFile: 'elm.js',
+
+      // (optional) add some parameters that are passed to elm-make
+      makeParameters: ['--warn']
     }
   },
 

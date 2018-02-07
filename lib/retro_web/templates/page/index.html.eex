@@ -1,5 +1,1 @@
-<div class="jumbotron">
-  <h2><%= gettext "%{name}", name: "Start or join a retro" %></h2>
-  <a class="btn btn-primary" href="/rooms/new"> Create a Retro </a>
-  <a class="btn btn-primary" href="/rooms"> Join a Retro </a>
-</div>
+<div id="elm-target"></div>
