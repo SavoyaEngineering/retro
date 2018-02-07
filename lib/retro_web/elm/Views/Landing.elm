@@ -3,6 +3,10 @@ import Html exposing (..)
 import Html.Attributes exposing (class, href)
 
 
+type Msg
+    = LandingMsg
+
+
 view : Html a
 view =
     div [class "jumbotron"]
