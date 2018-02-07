@@ -4,6 +4,7 @@ import Navigation exposing (Location)
 import Routing exposing (parseLocation)
 import Messages exposing (..)
 import View exposing (view)
+import Views.Landing
 
 
 
@@ -15,9 +16,8 @@ main =
         , update = update
         , subscriptions = \_ -> Sub.none
         }
---main : Html a
---main =
---  div [ class "elm-app" ] [ Views.Landing.view ]
+
+
 init : Location -> ( Model, Cmd Msg )
 init location =
     let
@@ -48,6 +48,10 @@ update msg model =
                     parseLocation location
             in
             ( { model | route = newRoute }, Cmd.none )
-
-        LandingMessage newMsg ->
+        LandingMessage subMsg ->
+            let
+                nextCmd = Views.Landing.update subMsg model
+            in
+            ( Tuple.first nextCmd, Cmd.map LandingMessage <| Tuple.second nextCmd )
+        NewRoomMessage newMsg ->
             ( { model | route = Models.LandingRoute }, Cmd.none )

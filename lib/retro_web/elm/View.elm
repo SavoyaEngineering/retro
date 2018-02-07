@@ -5,6 +5,7 @@ import Html.Attributes exposing (class)
 import Models exposing (Model)
 import Messages exposing (Msg)
 import Views.Landing
+import Views.NewRoom
 
 
 view : Model -> Html Msg
@@ -14,6 +15,8 @@ view model =
             case model.route of
                 Models.LandingRoute ->
                     map Messages.LandingMessage (Views.Landing.view)
+                Models.NewRoomRoute ->
+                    map Messages.NewRoomMessage (Views.NewRoom.view)
                 Models.NotFoundRoute ->
                     notFoundView
     in

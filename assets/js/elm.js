@@ -8747,6 +8747,121 @@ var _elm_lang$html$Html_Attributes$classList = function (list) {
 };
 var _elm_lang$html$Html_Attributes$style = _elm_lang$virtual_dom$VirtualDom$style;
 
+var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$html$Html_Events$targetChecked = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'checked',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$bool);
+var _elm_lang$html$Html_Events$targetValue = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'value',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$string);
+var _elm_lang$html$Html_Events$defaultOptions = _elm_lang$virtual_dom$VirtualDom$defaultOptions;
+var _elm_lang$html$Html_Events$onWithOptions = _elm_lang$virtual_dom$VirtualDom$onWithOptions;
+var _elm_lang$html$Html_Events$on = _elm_lang$virtual_dom$VirtualDom$on;
+var _elm_lang$html$Html_Events$onFocus = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'focus',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onBlur = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'blur',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onSubmitOptions = _elm_lang$core$Native_Utils.update(
+	_elm_lang$html$Html_Events$defaultOptions,
+	{preventDefault: true});
+var _elm_lang$html$Html_Events$onSubmit = function (msg) {
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'submit',
+		_elm_lang$html$Html_Events$onSubmitOptions,
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onCheck = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'change',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetChecked));
+};
+var _elm_lang$html$Html_Events$onInput = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'input',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
+};
+var _elm_lang$html$Html_Events$onMouseOut = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseout',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseOver = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseover',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseLeave = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseleave',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseEnter = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseenter',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseUp = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseup',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseDown = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mousedown',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onDoubleClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'dblclick',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'click',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$Options = F2(
+	function (a, b) {
+		return {stopPropagation: a, preventDefault: b};
+	});
+
 var _elm_lang$http$Native_Http = function() {
 
 
@@ -9765,17 +9880,23 @@ var _user$project$Models$Model = function (a) {
 	return {route: a};
 };
 var _user$project$Models$NotFoundRoute = {ctor: 'NotFoundRoute'};
+var _user$project$Models$NewRoomRoute = {ctor: 'NewRoomRoute'};
 var _user$project$Models$LandingRoute = {ctor: 'LandingRoute'};
 
+var _user$project$Routing$newRoomPath = '#new_room';
 var _user$project$Routing$landingPath = '';
 var _user$project$Routing$matchers = _evancz$url_parser$UrlParser$oneOf(
 	{
 		ctor: '::',
-		_0: A2(
-			_evancz$url_parser$UrlParser$map,
-			_user$project$Models$LandingRoute,
-			_evancz$url_parser$UrlParser$s('')),
-		_1: {ctor: '[]'}
+		_0: A2(_evancz$url_parser$UrlParser$map, _user$project$Models$LandingRoute, _evancz$url_parser$UrlParser$top),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_evancz$url_parser$UrlParser$map,
+				_user$project$Models$NewRoomRoute,
+				_evancz$url_parser$UrlParser$s('new_room')),
+			_1: {ctor: '[]'}
+		}
 	});
 var _user$project$Routing$parseLocation = function (location) {
 	var _p0 = A2(_evancz$url_parser$UrlParser$parseHash, _user$project$Routing$matchers, location);
@@ -9786,6 +9907,20 @@ var _user$project$Routing$parseLocation = function (location) {
 	}
 };
 
+var _user$project$Views_Landing$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'GoToNewRoom') {
+			return {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: _elm_lang$navigation$Navigation$load(_user$project$Routing$newRoomPath)
+			};
+		} else {
+			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		}
+	});
+var _user$project$Views_Landing$GoToNewRoom = {ctor: 'GoToNewRoom'};
 var _user$project$Views_Landing$view = A2(
 	_elm_lang$html$Html$div,
 	{
@@ -9806,13 +9941,13 @@ var _user$project$Views_Landing$view = A2(
 		_1: {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$a,
+				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$class('btn btn-primary'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href('/rooms/new'),
+						_0: _elm_lang$html$Html_Events$onClick(_user$project$Views_Landing$GoToNewRoom),
 						_1: {ctor: '[]'}
 					}
 				},
@@ -9824,7 +9959,7 @@ var _user$project$Views_Landing$view = A2(
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$a,
+					_elm_lang$html$Html$button,
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$class('btn btn-primary'),
@@ -9845,8 +9980,32 @@ var _user$project$Views_Landing$view = A2(
 	});
 var _user$project$Views_Landing$LandingMsg = {ctor: 'LandingMsg'};
 
+var _user$project$Views_NewRoom$view = A2(
+	_elm_lang$html$Html$div,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('jumbotron'),
+		_1: {ctor: '[]'}
+	},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$h2,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Create a retro for you and your friends'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	});
+var _user$project$Views_NewRoom$NewRoomMsg = {ctor: 'NewRoomMsg'};
+
 var _user$project$Messages$OnLocationChange = function (a) {
 	return {ctor: 'OnLocationChange', _0: a};
+};
+var _user$project$Messages$NewRoomMessage = function (a) {
+	return {ctor: 'NewRoomMessage', _0: a};
 };
 var _user$project$Messages$LandingMessage = function (a) {
 	return {ctor: 'LandingMessage', _0: a};
@@ -9863,10 +10022,13 @@ var _user$project$View$notFoundView = A2(
 var _user$project$View$view = function (model) {
 	var viewToBeSet = function () {
 		var _p0 = model.route;
-		if (_p0.ctor === 'LandingRoute') {
-			return A2(_elm_lang$html$Html$map, _user$project$Messages$LandingMessage, _user$project$Views_Landing$view);
-		} else {
-			return _user$project$View$notFoundView;
+		switch (_p0.ctor) {
+			case 'LandingRoute':
+				return A2(_elm_lang$html$Html$map, _user$project$Messages$LandingMessage, _user$project$Views_Landing$view);
+			case 'NewRoomRoute':
+				return A2(_elm_lang$html$Html$map, _user$project$Messages$NewRoomMessage, _user$project$Views_NewRoom$view);
+			default:
+				return _user$project$View$notFoundView;
 		}
 	}();
 	return A2(
@@ -9886,23 +10048,34 @@ var _user$project$View$view = function (model) {
 var _user$project$Main$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
-		if (_p0.ctor === 'OnLocationChange') {
-			var newRoute = _user$project$Routing$parseLocation(_p0._0);
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					model,
-					{route: newRoute}),
-				_1: _elm_lang$core$Platform_Cmd$none
-			};
-		} else {
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					model,
-					{route: _user$project$Models$LandingRoute}),
-				_1: _elm_lang$core$Platform_Cmd$none
-			};
+		switch (_p0.ctor) {
+			case 'OnLocationChange':
+				var newRoute = _user$project$Routing$parseLocation(_p0._0);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{route: newRoute}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'LandingMessage':
+				var nextCmd = A2(_user$project$Views_Landing$update, _p0._0, model);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Tuple$first(nextCmd),
+					_1: A2(
+						_elm_lang$core$Platform_Cmd$map,
+						_user$project$Messages$LandingMessage,
+						_elm_lang$core$Tuple$second(nextCmd))
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{route: _user$project$Models$LandingRoute}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _user$project$Main$initialModel = function (route) {

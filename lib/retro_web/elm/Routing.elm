@@ -8,7 +8,8 @@ import UrlParser exposing (..)
 matchers : Parser (Route -> a) a
 matchers =
     oneOf
-        [ map LandingRoute (s "")
+        [ map LandingRoute top,
+          map NewRoomRoute (s "new_room")
         ]
 
 
@@ -25,3 +26,7 @@ parseLocation location =
 landingPath : String
 landingPath =
     ""
+
+newRoomPath : String
+newRoomPath =
+    "#new_room"

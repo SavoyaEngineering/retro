@@ -8,4 +8,5 @@ type alias Model =
 
 type Route
     = LandingRoute
+    | NewRoomRoute
     | NotFoundRoute
