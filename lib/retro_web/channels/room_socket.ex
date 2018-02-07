@@ -1,4 +1,7 @@
 defmodule RetroWeb.RoomSocket do
+  @moduledoc """
+  Provides websocket connection via secure token
+  """
   use Phoenix.Socket
 
   # Channels

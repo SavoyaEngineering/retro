@@ -1,4 +1,7 @@
 defmodule Retro.Room do
+  @moduledoc """
+  Provides interface for retro rooms.
+  """
   use Ecto.Schema
   import Ecto.Changeset
   alias Retro.{Repo, Room}
@@ -11,6 +14,10 @@ defmodule Retro.Room do
     timestamps()
   end
 
+  @doc """
+  Changeset for room.
+  name and password are required.
+  """
   def changeset(%Room{} = room, attrs \\ %{}) do
     room
     |> cast(attrs, [:name, :password])
@@ -19,6 +26,9 @@ defmodule Retro.Room do
     |> hash_password()
   end
 
+  @doc """
+  Creates a new room
+  """
   def create(%{} = change) do
     changeset(%Room{}, change)
     |> Repo.insert
