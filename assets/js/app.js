@@ -19,3 +19,9 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 import socket from "./socket"
+import render from "./new-room"
+
+var newRoom = document.getElementById("react-new-room");
+if (newRoom) {
+    render(newRoom)
+}
