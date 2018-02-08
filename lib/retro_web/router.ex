@@ -19,8 +19,9 @@ defmodule RetroWeb.Router do
 
   pipeline :authorized do
     plug :fetch_session
-    plug Guardian.Plug.Pipeline, module: RetroWeb.Guardian,
-                                 error_handler: RetroWeb.AuthErrorHandler
+    plug Guardian.Plug.Pipeline,
+         module: RetroWeb.Guardian,
+         error_handler: RetroWeb.AuthErrorHandler
     plug Guardian.Plug.VerifySession
     plug Guardian.Plug.LoadResource
     plug :put_room_token
@@ -54,8 +55,10 @@ defmodule RetroWeb.Router do
     end
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", RetroWeb do
-  #   pipe_through :api
-  # end
+#   Other scopes may use custom stacks.
+   scope "/api", RetroWeb do
+     pipe_through :api
+
+     resources "/rooms", RoomController, only: [:index, :create, :new]
+   end
 end

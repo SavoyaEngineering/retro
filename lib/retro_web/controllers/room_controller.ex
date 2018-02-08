@@ -1,4 +1,5 @@
 defmodule RetroWeb.RoomController do
+  #TODO only respond to JSON requests
   use RetroWeb, :controller
 
   import Comeonin.Argon2, only: [checkpw: 2, dummy_checkpw: 0]
@@ -13,8 +14,6 @@ defmodule RetroWeb.RoomController do
 
   def new(conn, _params) do
     conn
-    |> assign(:errors, false)
-    |> assign(:changeset, Room.changeset(%Room{}))
     |> render("new.html")
   end
 
@@ -28,6 +27,21 @@ defmodule RetroWeb.RoomController do
         |> assign(:errors, true)
         |> assign(:changeset, changeset)
         |> render("new.html")
+    end
+  end
+
+  def create(conn, %{"name" => name, "password" => password}) do
+    case %{name: name, password: password}
+         |> Room.create do
+      {:ok, _model} ->
+        conn
+        |> put_status(201)
+        |> json(%{})
+      {:error, changeset} ->
+        errors = Enum.map(changeset.errors, &readable_error(&1))
+        conn
+        |> put_status(422)
+        |> json(%{errors: errors})
     end
   end
 
@@ -98,5 +112,10 @@ defmodule RetroWeb.RoomController do
       order_by: item.inserted_at
     )
     |> Repo.all()
+  end
+
+  defp readable_error(error) do
+    elem(error, 1)
+    |> elem(0)
   end
 end

@@ -24,35 +24,32 @@ defmodule RetroWeb.RetroControllerTest do
       conn = get conn, "/rooms/new"
 
       response = html_response(conn, 200)
-      assert response =~ "Create a retro"
     end
   end
 
   describe "POST /rooms" do
-    test "creates a room when the room is valid and redirects to index", %{conn: conn} do
+    test "it responds to JSON and creates a room", %{conn: conn} do
       params = %{name: "RETRO", password: "bethcatlover"}
 
 
-      conn = post conn, "/rooms", room: params
+      conn = post conn, "/rooms", params
 
 
-      redirect_path = redirected_to(conn)
-      assert redirect_path === "/rooms"
-
+      assert json_response(conn, 201) == %{}
       query = from room in "rooms", where: room.name == "RETRO", where: not(is_nil(room.password_hash)), select: room.name
       assert (Repo.all(query) |> Enum.count) == 1
     end
 
-    test "redirects to new with errors when the room is invalid", %{conn: conn} do
-      params = %{name: "", password: ""}
+    test "returns an error response when it cannot create a room", %{conn: conn} do
+      params = %{name: "RETRO", password: ""}
 
 
-      conn = post conn, "/rooms", room: params
+      conn = post conn, "/rooms", params
 
-      response = html_response(conn, 200)
-      assert response =~ "Create a retro"
-      assert response =~ "Name required"
-      assert response =~ "Password required"
+
+      assert json_response(conn, 422) == %{"errors" => ["Password required"]}
+      query = from room in "rooms", where: room.name == "RETRO", where: not(is_nil(room.password_hash)), select: room.name
+      assert (Repo.all(query) |> Enum.count) == 0
     end
   end
 
