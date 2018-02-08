@@ -9,6 +9,10 @@ use Mix.Config
 config :retro,
   ecto_repos: [Retro.Repo]
 
+config :mime, :types, %{
+  "application/json" => ["json"]
+}
+
 # Configures the endpoint
 config :retro, RetroWeb.Endpoint,
   url: [host: "localhost"],

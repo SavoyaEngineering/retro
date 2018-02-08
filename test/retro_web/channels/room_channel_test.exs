@@ -16,11 +16,10 @@ defmodule RetroWeb.RoomChannelTest do
     test "broadcasts to room:room_id", %{socket: socket} do
       push socket, "happy_msg", %{"body" => "JH: some retro item", "room_id" => 123}
 
-
       assert_receive %Phoenix.Socket.Broadcast{
         topic: "room:123",
-        event: "happy_msg",
-        payload: %{body: "JH: some retro item"}}
+        event: "new_msg",
+        payload: %{text: "JH: some retro item", id: _, type: "happy_msg"}}
     end
 
     test "broadcasts are pushed to the client", %{socket: socket} do

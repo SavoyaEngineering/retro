@@ -1,0 +1,44 @@
+Arguments: 
+  /Users/development/.nvm/versions/node/v7.10.1/bin/node /Users/development/.nvm/versions/node/v7.10.1/bin/yarn install
+
+PATH: 
+  /Users/development/.nvm/versions/node/v7.10.1/bin:/usr/local/opt/postgresql/bin:/Users/development/.rbenv/shims:/Users/development/.rbenv/bin:/Users/development/Library/Android/sdk/platform-tools:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+Yarn version: 
+  1.0.0
+
+Node version: 
+  7.10.1
+
+Platform: 
+  darwin x64
+
+npm manifest: 
+  {
+    "repository": {},
+    "license": "MIT",
+    "scripts": {
+      "deploy": "brunch build --production",
+      "watch": "brunch watch --stdin"
+    },
+    "dependencies": {
+      "phoenix": "file:../deps/phoenix",
+      "phoenix_html": "file:../deps/phoenix_html",
+    },
+    "devDependencies": {
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  SyntaxError: /Users/development/workspace/retro/assets/package.json: Unexpected token } in JSON at position 251
+      at JSON.parse (<anonymous>)
+      at /Users/development/.nvm/versions/node/v7.10.1/lib/node_modules/yarn/lib/cli.js:797:57
+      at Generator.next (<anonymous>)
+      at step (/Users/development/.nvm/versions/node/v7.10.1/lib/node_modules/yarn/lib/cli.js:92:30)
+      at /Users/development/.nvm/versions/node/v7.10.1/lib/node_modules/yarn/lib/cli.js:103:13

@@ -1,4 +1,5 @@
 defmodule RetroWeb.RoomController do
+  #TODO only respond to JSON requests once React routing is figured out
   use RetroWeb, :controller
 
   import Comeonin.Argon2, only: [checkpw: 2, dummy_checkpw: 0]
@@ -8,30 +9,36 @@ defmodule RetroWeb.RoomController do
   alias RetroWeb.Guardian
 
   def index(conn, _params) do
-    render(conn, "index.html")
+    case get_format(conn)  do
+      "html" ->
+        render(conn, "index.html")
+      "json" ->
+        rooms =
+          Repo.all(Room)
+          |> Enum.map(fn (room) -> Room.as_json(room) end)
+        json(conn, %{rooms: rooms})
+    end
   end
 
   def new(conn, _params) do
     conn
-    |> assign(:errors, false)
-    |> assign(:changeset, Room.changeset(%Room{}))
     |> render("new.html")
   end
 
-  def create(conn, %{"room" => %{"name" => name, "password" => password}}) do
+  def create(conn, %{"name" => name, "password" => password}) do
     case %{name: name, password: password}
          |> Room.create do
       {:ok, _model} ->
-        redirect(conn, to: "/rooms")
-      {:error, changeset} ->
         conn
-        |> assign(:errors, true)
-        |> assign(:changeset, changeset)
-        |> render("new.html")
+        |> put_status(201)
+        |> json(%{})
+      {:error, changeset} ->
+        Enum.map(changeset.errors, &readable_error(&1))
+        |> error_response(conn)
     end
   end
 
-  def go_to_room(conn, %{"room" => %{"id" => id, "password" => password}}) do
+  def go_to_room(conn, %{"id" => id, "password" => password}) do
     room = Repo.get(Room, id)
 
     result = cond do
@@ -47,34 +54,32 @@ defmodule RetroWeb.RoomController do
 
     case result do
       {:ok, conn} ->
-        conn
-        |> put_flash(:info, "You have joined the retro")
-        |> assign(:room, room)
-        |> redirect(to: "/rooms/#{room.id}")
+        json(conn, %{room_token: get_room_token(room)})
       {:error, _reason, conn} ->
-        conn
-        |> put_flash(:error, "Invalid password")
-        |> render("index.html")
+        error_response(["Invalid password"], conn)
     end
   end
 
   def show(conn, %{"id" => id}) do
-    room = Repo.get(Room, id)
-
-    if room do
-      authenticated_room_id = Guardian.Plug.current_resource(conn)[:id]
-      if id == authenticated_room_id  do
+    case get_format(conn)  do
+      "html" ->
         conn
-        |> assign(:room, room)
-        |> assign(:happy_items, items_for_room(room, "happy_msg"))
-        |> assign(:middle_items, items_for_room(room, "middle_msg"))
-        |> assign(:sad_items, items_for_room(room, "sad_msg"))
         |> render("show.html")
-      else
-        room_not_found(conn)
-      end
-    else
-      room_not_found(conn)
+      "json" ->
+        room = Repo.get(Room, id)
+        if room.id === current_room_for_conn(conn) do
+          json(
+            conn,
+            %{
+              id: room.id,
+              name: room.name,
+              socket_token: get_socket_token(conn, room.id),
+              items: items_for_room(room),
+            }
+          )
+        else
+          error_response(["Invalid token"], conn)
+        end
     end
   end
 
@@ -83,20 +88,45 @@ defmodule RetroWeb.RoomController do
     |> Guardian.Plug.sign_in(room)
   end
 
+  defp get_room_token(room) do
+    {:ok, token, _} = RetroWeb.Guardian.encode_and_sign(room)
+    token
+  end
+
+  defp get_socket_token(conn, room_id) do
+    Phoenix.Token.sign(conn, "room socket", room_id)
+  end
+
+  def current_room_for_conn(conn) do
+    {id, _} = Integer.parse(Guardian.Plug.current_resource(conn)[:id])
+    id
+  end
+
   defp room_not_found(conn) do
     conn
     |> put_flash(:error, "Retro not found")
     |> redirect(to: "/rooms")
   end
 
-  defp items_for_room(room, item_type) do
+  defp items_for_room(room) do
     from(
       item in Item,
-      where: item.type == ^item_type,
       where: item.room_id == ^room.id,
       where: item.archived == false,
       order_by: item.inserted_at
     )
     |> Repo.all()
+    |> Enum.map(fn (item) -> Item.as_json(item) end)
+  end
+
+  defp readable_error(error) do
+    elem(error, 1)
+    |> elem(0)
+  end
+
+  defp error_response(errors, conn) do
+    conn
+    |> put_status(422)
+    |> json(%{errors: errors})
   end
 end

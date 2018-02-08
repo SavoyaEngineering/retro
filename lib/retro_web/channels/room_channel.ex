@@ -9,7 +9,7 @@ defmodule RetroWeb.RoomChannel do
 
   def handle_in(msg_type, %{"body" => body, "room_id" => room_id}, socket) do
     {:ok, item} = Item.create(%{text: body, type: msg_type, room_id: room_id})
-    broadcast!(socket, msg_type, %{body: body, item_id: item.id})
+    broadcast!(socket, "new_msg", %{id: item.id, text: item.text, type: item.type})
     {:noreply, socket}
   end
 
