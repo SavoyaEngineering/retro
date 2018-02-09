@@ -136,7 +136,7 @@ class Room extends React.Component<any, any> {
           {happyItems}
         </div>
         <div className="retro-column form-group">
-          <input type="text" className="form-control" placeholder="Something happy"
+          <input type="text" className="form-control" placeholder="Something meh"
                  value={this.state.middle_msg} onChange={this.handleTextChange.bind(this, "middle_msg")}/>
           <button className="btn btn-primary btn-block"
                   onClick={this.addItem.bind(this, "middle_msg")}>Add Item</button>
@@ -144,7 +144,7 @@ class Room extends React.Component<any, any> {
           {middleItems}
         </div>
         <div className="retro-column form-group">
-          <input type="text" className="form-control" placeholder="Something happy"
+          <input type="text" className="form-control" placeholder="Something sad"
                  value={this.state.sad_msg} onChange={this.handleTextChange.bind(this, "sad_msg")}/>
           <button className="btn btn-primary btn-block"
                   onClick={this.addItem.bind(this, "sad_msg")}>Add Item</button>
