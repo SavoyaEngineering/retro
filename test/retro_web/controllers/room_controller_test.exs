@@ -114,10 +114,8 @@ defmodule RetroWeb.RetroControllerTest do
 
       response = json_response(conn, 200)
       assert response["name"] === "Dev Retro"
-      items = response["items"]
-      assert Enum.count(items["happy_items"]) === 1
-      assert Enum.count(items["middle_items"]) === 0
-      assert Enum.count(items["sad_items"]) === 0
+      assert response["socket_token"] !== nil
+      assert Enum.count(response["items"]) === 1
     end
 
     test "sends error response when room token is bad", %{conn: conn} do

@@ -30,7 +30,8 @@ defmodule Retro.Item do
       id: item.id,
       text: item.text,
       room_id: item.room_id,
-      archived: item.archived
+      archived: item.archived,
+      type: item.type
     }
   end
 

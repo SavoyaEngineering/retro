@@ -73,11 +73,8 @@ defmodule RetroWeb.RoomController do
             %{
               id: room.id,
               name: room.name,
-              items: %{
-                happy_items: items_for_room(room, "happy_msg"),
-                middle_items: items_for_room(room, "middle_msg"),
-                sad_items: items_for_room(room, "sad_msg")
-              }
+              socket_token: get_socket_token(conn, room.id),
+              items: items_for_room(room),
             }
           )
         else
@@ -96,6 +93,10 @@ defmodule RetroWeb.RoomController do
     token
   end
 
+  defp get_socket_token(conn, room_id) do
+    Phoenix.Token.sign(conn, "room socket", room_id)
+  end
+
   def current_room_for_conn(conn) do
     {id, _} = Integer.parse(Guardian.Plug.current_resource(conn)[:id])
     id
@@ -107,10 +108,9 @@ defmodule RetroWeb.RoomController do
     |> redirect(to: "/rooms")
   end
 
-  defp items_for_room(room, item_type) do
+  defp items_for_room(room) do
     from(
       item in Item,
-      where: item.type == ^item_type,
       where: item.room_id == ^room.id,
       where: item.archived == false,
       order_by: item.inserted_at
