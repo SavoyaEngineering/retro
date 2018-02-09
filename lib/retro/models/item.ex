@@ -25,6 +25,15 @@ defmodule Retro.Item do
     |> Repo.insert
   end
 
+  def as_json(%Item{} = item) do
+    %{
+      id: item.id,
+      text: item.text,
+      room_id: item.room_id,
+      archived: item.archived
+    }
+  end
+
   def archive(%Item{} = item) do
     changeset(item, %{archived: true})
       |> Repo.update

@@ -13,29 +13,17 @@ defmodule RetroWeb.Router do
     plug :accepts, ["json"]
   end
 
-  pipeline :unauthorized do
-    plug :fetch_session
-  end
-
-  pipeline :authorized do
-    plug :fetch_session
+  pipeline :api_authorized do
     plug Guardian.Plug.Pipeline,
          module: RetroWeb.Guardian,
          error_handler: RetroWeb.AuthErrorHandler
-    plug Guardian.Plug.VerifySession
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
     plug Guardian.Plug.LoadResource
-    plug :put_room_token
   end
 
-  defp put_room_token(conn, _) do
-    if current_room_id = conn.private.guardian_default_resource[:id] do
-      token = Phoenix.Token.sign(conn, "room socket", current_room_id)
-      assign(conn, :room_token, token)
-    else
-      conn
-    end
+  pipeline :unauthorized do
+    plug :fetch_session
   end
-
 
   scope "/", RetroWeb do
     pipe_through :browser # Use the default browser stack
@@ -45,20 +33,19 @@ defmodule RetroWeb.Router do
 
       get "/", PageController, :index
 
-      resources "/rooms", RoomController, only: [:index, :create, :new]
-      post "/rooms/go_to_room", RoomController, :go_to_room
-    end
-
-    scope "/" do
-      pipe_through :authorized
-      resources "/rooms", RoomController, only: [:show]
+      resources "/rooms", RoomController, only: [:index, :new, :show]
     end
   end
 
 #   Other scopes may use custom stacks.
-   scope "/api", RetroWeb do
-     pipe_through :api
+  scope "/api", RetroWeb do
+    pipe_through :api
+    resources "/rooms", RoomController, only: [:index, :create]
+    post "/rooms/go_to_room", RoomController, :go_to_room
 
-     resources "/rooms", RoomController, only: [:index, :create, :new]
-   end
+    scope "/" do
+      pipe_through :api_authorized
+      resources "/rooms", RoomController, only: [:show]
+    end
+  end
 end

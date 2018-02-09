@@ -1,7 +1,10 @@
 function headers() {
+    const token = localStorage.getItem('roomToken');
+    console.log(token);
     return {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        Authorization: `Bearer: ${token}`
     };
 }
 

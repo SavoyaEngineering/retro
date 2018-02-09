@@ -1,6 +1,5 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
-import {Router} from "react-router"
 import api from './api';
 
 class NewRoom extends React.Component<any, any> {
@@ -55,14 +54,14 @@ class NewRoom extends React.Component<any, any> {
             <input type="text" name="room-password" className="form-control" placeholder="Password"
                    value={this.state.password} onChange={this.handleChange.bind(this, "password")}/>
           </div>
-          <input type="submit" value="Submit" className="btn btn-primary"/>
+          <input type="submit" value="Create Retro" className="btn btn-primary"/>
         </form>
       </div>
     )
   }
 }
 
-export default function render(node) {
+export default function renderNewRoom(node) {
   ReactDOM.render(
     (<div>
       <NewRoom/>

@@ -6,16 +6,23 @@ defmodule RetroWeb.RetroControllerTest do
 
   describe "GET /rooms" do
     test "renders room/index.html", %{conn: conn} do
-      Room.create(%{name: "Accounting Retro", password: "bethcatlover"})
-      Room.create(%{name: "Dev Retro", password: "bethcatlover"})
-
-
       conn = get conn, "/rooms"
 
 
-      response = html_response(conn, 200)
-      assert response =~ "Accounting Retro"
-      assert response =~ "Dev Retro"
+      html_response(conn, 200)
+    end
+
+    test "when request for JSON it returns a list of rooms", %{conn: conn} do
+      {:ok, room1} = Room.create(%{name: "Accounting Retro", password: "bethcatlover"})
+      {:ok, room2} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+
+
+      conn = get conn, "api/rooms"
+
+
+      assert json_response(conn, 200) == %{
+               "rooms" => [%{"id" => room1.id, "name" => "Accounting Retro"}, %{"id" => room2.id, "name" => "Dev Retro"}]
+             }
     end
   end
 
@@ -23,7 +30,8 @@ defmodule RetroWeb.RetroControllerTest do
     test "renders room/new.html", %{conn: conn} do
       conn = get conn, "/rooms/new"
 
-      response = html_response(conn, 200)
+
+      html_response(conn, 200)
     end
   end
 
@@ -32,7 +40,7 @@ defmodule RetroWeb.RetroControllerTest do
       params = %{name: "RETRO", password: "bethcatlover"}
 
 
-      conn = post conn, "/rooms", params
+      conn = post conn, "api/rooms", params
 
 
       assert json_response(conn, 201) == %{}
@@ -44,7 +52,7 @@ defmodule RetroWeb.RetroControllerTest do
       params = %{name: "RETRO", password: ""}
 
 
-      conn = post conn, "/rooms", params
+      conn = post conn, "api/rooms", params
 
 
       assert json_response(conn, 422) == %{"errors" => ["Password required"]}
@@ -58,58 +66,91 @@ defmodule RetroWeb.RetroControllerTest do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
 
-      conn = post conn, "/rooms/go_to_room/", room: %{id: room.id, password: "bethcatlover"}
+      conn = post conn, "api/rooms/go_to_room/", %{id: room.id, password: "bethcatlover"}
 
 
-      redirect_path = redirected_to(conn)
-      assert redirect_path === "/rooms/#{room.id}"
+      response  = json_response(conn, 200)
+      assert response["room_token"] != nil
     end
+
 
     test "it renders index and sets flash when the password is incorrect", %{conn: conn} do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
 
-      conn = post conn, "/rooms/go_to_room/", room: %{id: room.id, password: "wrong"}
+      conn = post conn, "api/rooms/go_to_room/", %{id: room.id, password: "wrong"}
 
-      response = html_response(conn, 200)
-      assert response =~ "Select a retro room"
-      assert response =~ "Invalid password"
+
+      assert json_response(conn, 422) == %{"errors" => ["Invalid password"]}
     end
   end
 
   describe "GET /rooms/:id" do
-    test "it lets someone who is logged into the room view the room" do
+    test "it loads show.html when request is for html", %{conn: conn} do
+      {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+
+
+      conn = get conn, "rooms/#{room.id}"
+
+
+      html_response(conn, 200)
+    end
+
+    test "it loads data for the room when the request is for JSON", %{conn: conn} do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
       Item.create(%{room_id: room.id, type: "happy_msg", text: "JH - foosball table", archived: false})
       Item.create(%{room_id: room.id, type: "happy_msg", text: "JH - archived", archived: true})
 
       #setup the connection signed into that room
-      conn = build_conn()
-             |> RetroWeb.Guardian.Plug.sign_in(room)
+      {:ok, token, _} = RetroWeb.Guardian.encode_and_sign(room)
+      conn = conn
+             |> put_req_header("accept", "application/json")
+             |> put_req_header("authorization", "Bearer: #{token}")
 
 
-      conn = get conn, "rooms/#{room.id}"
+      conn = get conn, "api/rooms/#{room.id}"
 
 
-      response = html_response(conn, 200)
-      assert response =~ "Dev Retro"
-      assert response =~ "JH - foosball table"
-      assert (response =~ "JH - archived") === false
+      response = json_response(conn, 200)
+      assert response["name"] === "Dev Retro"
+      items = response["items"]
+      assert Enum.count(items["happy_items"]) === 1
+      assert Enum.count(items["middle_items"]) === 0
+      assert Enum.count(items["sad_items"]) === 0
     end
 
-    test "it redirects to index when someone who is not logged into the room visits" do
+    test "sends error response when room token is bad", %{conn: conn} do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
       {:ok, other_room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+
       #setup the connection signed into that room
-      conn = build_conn()
-             |> RetroWeb.Guardian.Plug.sign_in(room)
+      conn = conn
+             |> put_req_header("accept", "application/json")
+             |> put_req_header("authorization", "Bearer: wrong")
 
 
-      conn = get conn, "rooms/#{other_room.id}"
+      conn = get conn, "api/rooms/#{other_room.id}"
 
-      redirect_path = redirected_to(conn)
-      assert redirect_path === "/rooms"
+
+      response(conn, 401)
+    end
+
+    test "sends error response when room token is for the wrong room", %{conn: conn} do
+      {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+      {:ok, other_room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+
+      #setup the connection signed into that room
+      {:ok, token, _} = RetroWeb.Guardian.encode_and_sign(room)
+      conn = conn
+             |> put_req_header("accept", "application/json")
+             |> put_req_header("authorization", "Bearer: #{token}")
+
+
+      conn = get conn, "api/rooms/#{other_room.id}"
+
+
+      json_response(conn, 422) === %{"errors" => ["Invalid token"]}
     end
   end
 end

@@ -24,6 +24,13 @@ defmodule Retro.Room do
     |> Repo.insert
   end
 
+  def as_json(%Room{} = room) do
+    %{
+      id: room.id,
+      name: room.name
+    }
+  end
+
   defp hash_password(
          %Ecto.Changeset{
            valid?: true,
