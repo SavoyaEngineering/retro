@@ -25,6 +25,15 @@ defmodule RetroWeb.RoomChannel do
     broadcast_item_change(action, id, socket)
   end
 
+  def handle_in("thumbs_up" = action, %{"item_id" => id}, socket) do
+    if item = Repo.get(Item, id) do
+      Item.changeset(item, %{thumbs_up_count: item.thumbs_up_count + 1})
+      |> Repo.update
+    end
+
+    broadcast_item_change(action, id, socket)
+  end
+
   defp broadcast_item_change(action, id, socket) do
     broadcast!(socket, action, %{item_id: id})
     {:noreply, socket}

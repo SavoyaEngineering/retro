@@ -8,13 +8,14 @@ defmodule Retro.Item do
     field :type, :string
     field :room_id, :integer
     field :archived, :boolean
+    field :thumbs_up_count, :integer
 
     timestamps()
   end
 
   def changeset(%Item{} = item, attrs \\ %{}) do
     item
-    |> cast(attrs, [:text, :type, :room_id, :archived])
+    |> cast(attrs, [:text, :type, :room_id, :archived, :thumbs_up_count])
     |> validate_required([:room_id], message: "Room ID required")
     |> validate_required([:text], message: "Text required")
     |> validate_required([:type], message: "Type required")
@@ -31,7 +32,8 @@ defmodule Retro.Item do
       text: item.text,
       room_id: item.room_id,
       archived: item.archived,
-      type: item.type
+      type: item.type,
+      thumbs_up_count: item.thumbs_up_count
     }
   end
 

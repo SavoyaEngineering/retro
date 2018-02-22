@@ -72,6 +72,18 @@ class Room extends React.Component<any, any> {
           this.setupColumnItems();
         });
 
+        //setup thumbs up listener
+        this.channel.on("thumbs_up", payload => {
+          this.setState({
+            allItems: this.state.allItems.map(item => {
+              if (item.id === payload.item_id) {
+                item.thumbs_up_count += 1;
+              }
+              return item
+            })
+          });
+        });
+
         //setup new msg listener
         this.channel.on("new_msg", payload => {
           this.state.allItems.push(payload);
@@ -106,16 +118,30 @@ class Room extends React.Component<any, any> {
     this.channel.push("archive_item", {item_id: item.id});
   };
 
+  thumbsUp(item, event) {
+    console.log(event);
+    event.preventDefault();
+    this.channel.push("thumbs_up", {item_id: item.id})
+  }
+
   render() {
     this.renderItems = function (items) {
       return items.map((item: object) =>
-        <li className={item.selected ? "selected-item" : "thumbnail"} key={item.id} id={item.id}
-            onClick={this.focusItem.bind(this, item)}>{item.text}
-          {item.selected &&
-          <button className="btn btn-primary btn-block"
-                  onClick={this.archiveItem.bind(this, item)}>Archive</button>
-          }
-        </li>
+        <div className="thumbnail" key={item.id}>
+          <div className={item.selected ? "caption selected-item" : "caption"} id={item.id}>
+            <a onClick={this.focusItem.bind(this, item)} className="center-block" href="#">
+              {item.text}
+            </a>
+            {!item.selected &&
+            <button className="btn-sm btn-secondary"
+                    onClick={this.thumbsUp.bind(this, item)}>+{item.thumbs_up_count}</button>
+            }
+            {item.selected &&
+            <button className="btn btn-primary btn-block"
+                    onClick={this.archiveItem.bind(this, item)}>Archive</button>
+            }
+          </div>
+        </div>
       )
     };
 
@@ -124,7 +150,7 @@ class Room extends React.Component<any, any> {
     const sadItems = this.renderItems(this.state.sadItems);
     return (
       <div>
-        <div className='jumbotron'>
+        <div className="jumbotron">
           <h2>{this.state.name}</h2>
         </div>
         <div className="retro-column form-group">

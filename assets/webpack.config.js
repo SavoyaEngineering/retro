@@ -44,7 +44,7 @@ const config = {
   },
   plugins: [
     new ExtractTextPlugin({
-      filename: "css/[name].css"
+      filename: "css/app.css"
     }),
     new CopyWebpackPlugin([{ from: "./static" }])
   ]

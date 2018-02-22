@@ -1,4 +1,13 @@
 /* This file is for your main application scss. */
+@import '~bootstrap/dist/css/bootstrap.min.css';
+.logo {
+  width: 100%;
+  height: 180px;
+  display: inline-block;
+  margin-bottom: 1em;
+  background-image: url("/images/retro.png");
+  background-size: 100% 180px;
+}
 
 .retro-column {
     float: left;
@@ -7,15 +16,5 @@
 }
 
 .selected-item {
-    display: block;
-    padding: 20px;
-    margin-bottom: 20px;
-    line-height: 1.42857143;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    -webkit-transition: border .2s ease-in-out;
-    -o-transition: border .2s ease-in-out;
-    transition: border .2s ease-in-out;
     background-color: lightgrey;
 }
