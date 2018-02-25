@@ -1,7 +1,8 @@
 import * as React from "react"
-import * as ReactDOM from "react-dom"
+
 import api from './api';
 import {Socket} from "phoenix"
+import Landing from "./landing";
 
 class Room extends React.Component<any, any> {
   constructor(props: object) {
@@ -182,11 +183,4 @@ class Room extends React.Component<any, any> {
   }
 }
 
-export default function renderRoom(node) {
-  ReactDOM.render(
-    (<div>
-      <Room/>
-    </div>),
-    node
-  )
-}
+export default Room;

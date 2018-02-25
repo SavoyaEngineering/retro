@@ -14,7 +14,7 @@
     "popper.js": "^1.12.9",
     "postcss-loader": "^2.1.0",
     "precss": "^3.1.1",
-    "react-router": "^4.2.0"
+    "react-router-dom": "^4.2.2"
   },
   "devDependencies": {
     "@types/phoenix": "^0.0.4",

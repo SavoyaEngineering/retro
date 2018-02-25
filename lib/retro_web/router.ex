@@ -3,10 +3,6 @@ defmodule RetroWeb.Router do
 
   pipeline :browser do
     plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
   end
 
   pipeline :api do
@@ -25,17 +21,6 @@ defmodule RetroWeb.Router do
     plug :fetch_session
   end
 
-  scope "/", RetroWeb do
-    pipe_through :browser # Use the default browser stack
-
-    scope "/" do
-      pipe_through :unauthorized
-
-      get "/", PageController, :index
-
-      resources "/rooms", RoomController, only: [:index, :new, :show]
-    end
-  end
 
 #   Other scopes may use custom stacks.
   scope "/api", RetroWeb do
@@ -46,6 +31,15 @@ defmodule RetroWeb.Router do
     scope "/" do
       pipe_through :api_authorized
       resources "/rooms", RoomController, only: [:show]
+    end
+  end
+
+  scope "/", RetroWeb do
+    pipe_through :browser # Use the default browser stack
+
+    scope "/" do
+      pipe_through :unauthorized
+      get "/*path", PageController, :index #tell phoenix html requests to go here and die
     end
   end
 end

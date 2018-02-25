@@ -5,13 +5,6 @@ defmodule RetroWeb.RetroControllerTest do
   alias Retro.{Repo, Room, Item}
 
   describe "GET /rooms" do
-    test "renders room/index.html", %{conn: conn} do
-      conn = get conn, "/rooms"
-
-
-      html_response(conn, 200)
-    end
-
     test "when request for JSON it returns a list of rooms", %{conn: conn} do
       {:ok, room1} = Room.create(%{name: "Accounting Retro", password: "bethcatlover"})
       {:ok, room2} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
@@ -23,15 +16,6 @@ defmodule RetroWeb.RetroControllerTest do
       assert json_response(conn, 200) == %{
                "rooms" => [%{"id" => room1.id, "name" => "Accounting Retro"}, %{"id" => room2.id, "name" => "Dev Retro"}]
              }
-    end
-  end
-
-  describe "GET /rooms/new" do
-    test "renders room/new.html", %{conn: conn} do
-      conn = get conn, "/rooms/new"
-
-
-      html_response(conn, 200)
     end
   end
 
@@ -86,17 +70,7 @@ defmodule RetroWeb.RetroControllerTest do
   end
 
   describe "GET /rooms/:id" do
-    test "it loads show.html when request is for html", %{conn: conn} do
-      {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
-
-
-      conn = get conn, "rooms/#{room.id}"
-
-
-      html_response(conn, 200)
-    end
-
-    test "it loads data for the room when the request is for JSON", %{conn: conn} do
+    test "it loads data for the room", %{conn: conn} do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
       Item.create(%{room_id: room.id, type: "happy_msg", text: "JH - foosball table", archived: false})

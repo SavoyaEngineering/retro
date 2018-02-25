@@ -1,6 +1,7 @@
 import * as React from "react"
-import * as ReactDOM from "react-dom"
+
 import api from './api';
+import Landing from "./landing";
 
 class NewRoom extends React.Component<any, any> {
   constructor(props: object) {
@@ -61,11 +62,4 @@ class NewRoom extends React.Component<any, any> {
   }
 }
 
-export default function renderNewRoom(node) {
-  ReactDOM.render(
-    (<div>
-      <NewRoom/>
-    </div>),
-    node
-  )
-}
+export default NewRoom;

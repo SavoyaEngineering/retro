@@ -9,20 +9,10 @@ defmodule RetroWeb.RoomController do
   alias RetroWeb.Guardian
 
   def index(conn, _params) do
-    case get_format(conn)  do
-      "html" ->
-        render(conn, "index.html")
-      "json" ->
-        rooms =
-          Repo.all(Room)
-          |> Enum.map(fn (room) -> Room.as_json(room) end)
-        json(conn, %{rooms: rooms})
-    end
-  end
-
-  def new(conn, _params) do
-    conn
-    |> render("new.html")
+    rooms =
+      Repo.all(Room)
+      |> Enum.map(fn (room) -> Room.as_json(room) end)
+    json(conn, %{rooms: rooms})
   end
 
   def create(conn, %{"name" => name, "password" => password}) do
@@ -61,25 +51,19 @@ defmodule RetroWeb.RoomController do
   end
 
   def show(conn, %{"id" => id}) do
-    case get_format(conn)  do
-      "html" ->
-        conn
-        |> render("show.html")
-      "json" ->
-        room = Repo.get(Room, id)
-        if room.id === current_room_for_conn(conn) do
-          json(
-            conn,
-            %{
-              id: room.id,
-              name: room.name,
-              socket_token: get_socket_token(conn, room.id),
-              items: items_for_room(room),
-            }
-          )
-        else
-          error_response(["Invalid token"], conn)
-        end
+    room = Repo.get(Room, id)
+    if room.id === current_room_for_conn(conn) do
+      json(
+        conn,
+        %{
+          id: room.id,
+          name: room.name,
+          socket_token: get_socket_token(conn, room.id),
+          items: items_for_room(room),
+        }
+      )
+    else
+      error_response(["Invalid token"], conn)
     end
   end
 
@@ -100,12 +84,6 @@ defmodule RetroWeb.RoomController do
   def current_room_for_conn(conn) do
     {id, _} = Integer.parse(Guardian.Plug.current_resource(conn)[:id])
     id
-  end
-
-  defp room_not_found(conn) do
-    conn
-    |> put_flash(:error, "Retro not found")
-    |> redirect(to: "/rooms")
   end
 
   defp items_for_room(room) do
