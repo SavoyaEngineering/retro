@@ -120,7 +120,6 @@ class Room extends React.Component<any, any> {
   };
 
   thumbsUp(item, event) {
-    console.log(event);
     event.preventDefault();
     this.channel.push("thumbs_up", {item_id: item.id})
   }
