@@ -27,8 +27,8 @@ defmodule RetroWeb.RoomController do
     end
   end
 
-  def go_to_room(conn, %{"id" => id, "password" => password}) do
-    room = Repo.get(Room, id)
+  def go_to_room(conn, %{"name" => name, "password" => password}) do
+    room = Repo.get_by(Room, name: name)
 
     result = cond do
       room && checkpw(password, room.password_hash) ->
@@ -45,7 +45,7 @@ defmodule RetroWeb.RoomController do
       {:ok, conn} ->
         json(conn, go_to_room_response(room))
       {:error, _reason, conn} ->
-        error_response(["Invalid password"], conn)
+        error_response(["Invalid credentials"], conn)
     end
   end
 

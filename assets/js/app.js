@@ -4,4 +4,3 @@ import * as React from "react"
 
 import renderApp from "./main"
 
-renderApp(document.getElementById());

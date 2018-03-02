@@ -36,9 +36,10 @@ class NewRoom extends React.Component<any, any> {
     return (
       <div>
         <div className='jumbotron'>
-          <h2>Create a retro for you and your friends</h2>
+          <h2>Create a Retro for you and your friends.</h2>
+          <p>A Retro is a room for collaborative meetings. Choose a name and password to get started.</p>
         </div>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleSubmit} className="col-md-4 col-md-offset-4">
           <div>
             {errors}
           </div>
@@ -53,7 +54,7 @@ class NewRoom extends React.Component<any, any> {
             <label htmlFor="room-password">
               Password:
             </label>
-            <input type="text" name="room-password" className="form-control" placeholder="Password"
+            <input type="password" name="room-password" className="form-control" placeholder="Password"
                    value={this.state.password} onChange={this.handleChange.bind(this, "password")}/>
           </div>
           <input type="submit" value="Create Retro" className="btn btn-primary"/>

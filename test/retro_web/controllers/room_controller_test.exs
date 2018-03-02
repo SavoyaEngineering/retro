@@ -53,7 +53,7 @@ defmodule RetroWeb.RetroControllerTest do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
 
-      conn = post conn, "api/rooms/go_to_room/", %{id: room.id, password: "bethcatlover"}
+      conn = post conn, "api/rooms/go_to_room/", %{name: "Dev Retro", password: "bethcatlover"}
 
 
       response  = json_response(conn, 200)
@@ -61,15 +61,22 @@ defmodule RetroWeb.RetroControllerTest do
       assert response["room_id"] == room.id
     end
 
-
-    test "it renders index and sets flash when the password is incorrect", %{conn: conn} do
-      {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
-
-
-      conn = post conn, "api/rooms/go_to_room/", %{id: room.id, password: "wrong"}
+    test "it returns error when password is invalid", %{conn: conn} do
+      {:ok, _room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
 
-      assert json_response(conn, 422) == %{"errors" => ["Invalid password"]}
+      conn = post conn, "api/rooms/go_to_room/", %{name: "Dev Retro", password: "wrong"}
+
+
+      assert json_response(conn, 422) == %{"errors" => ["Invalid credentials"]}
+    end
+
+    test "it returns error when no room is found", %{conn: conn} do
+      {:ok, _room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+
+      conn = post conn, "api/rooms/go_to_room/", %{name: "Wrong room", password: "wrong"}
+
+      assert json_response(conn, 422) == %{"errors" => ["Invalid credentials"]}
     end
   end
 
