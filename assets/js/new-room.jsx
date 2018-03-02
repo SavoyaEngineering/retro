@@ -23,8 +23,9 @@ class NewRoom extends React.Component<any, any> {
     event.preventDefault();
     var data: object = {name: this.state.name, password: this.state.password};
     api.post('/api/rooms', data)
-      .then(() => {
-        window.location = '/rooms'
+      .then((response) => {
+        localStorage.setItem("roomToken", response.room_token);
+        window.location = '/rooms/' + response.room_id;
       }, (errorResponse) => {
         this.setState({errors: errorResponse.errors})
       });

@@ -27,9 +27,12 @@ defmodule RetroWeb.RetroControllerTest do
       conn = post conn, "api/rooms", params
 
 
-      assert json_response(conn, 201) == %{}
-      query = from room in "rooms", where: room.name == "RETRO", where: not(is_nil(room.password_hash)), select: room.name
+      query = from room in "rooms", where: room.name == "RETRO", where: not(is_nil(room.password_hash)), select: room.id
       assert (Repo.all(query) |> Enum.count) == 1
+      room_id = Repo.one(query)
+      response  = json_response(conn, 201)
+      assert response["room_token"] != nil
+      assert response["room_id"] == room_id
     end
 
     test "returns an error response when it cannot create a room", %{conn: conn} do
@@ -55,6 +58,7 @@ defmodule RetroWeb.RetroControllerTest do
 
       response  = json_response(conn, 200)
       assert response["room_token"] != nil
+      assert response["room_id"] == room.id
     end
 
 

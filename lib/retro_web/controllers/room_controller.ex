@@ -1,5 +1,4 @@
 defmodule RetroWeb.RoomController do
-  #TODO only respond to JSON requests once React routing is figured out
   use RetroWeb, :controller
 
   import Comeonin.Argon2, only: [checkpw: 2, dummy_checkpw: 0]
@@ -18,10 +17,10 @@ defmodule RetroWeb.RoomController do
   def create(conn, %{"name" => name, "password" => password}) do
     case %{name: name, password: password}
          |> Room.create do
-      {:ok, _model} ->
+      {:ok, room} ->
         conn
         |> put_status(201)
-        |> json(%{})
+        |> json(go_to_room_response(room))
       {:error, changeset} ->
         Enum.map(changeset.errors, &readable_error(&1))
         |> error_response(conn)
@@ -44,7 +43,7 @@ defmodule RetroWeb.RoomController do
 
     case result do
       {:ok, conn} ->
-        json(conn, %{room_token: get_room_token(room)})
+        json(conn, go_to_room_response(room))
       {:error, _reason, conn} ->
         error_response(["Invalid password"], conn)
     end
@@ -70,6 +69,10 @@ defmodule RetroWeb.RoomController do
   defp login(conn, room) do
     conn
     |> Guardian.Plug.sign_in(room)
+  end
+
+  defp go_to_room_response(room) do
+    %{room_token: get_room_token(room), room_id: room.id}
   end
 
   defp get_room_token(room) do

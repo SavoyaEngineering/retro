@@ -33,7 +33,7 @@ defmodule RetroWeb.RoomChannelTest do
       push socket, "happy_msg", %{"body" => "JH: some retro item", "room_id" => 123}
 
 
-      Process.sleep(10) #this sleep has to be here as the process is async and takes some amount of time
+      Process.sleep(100) #this sleep has to be here as the process is async and takes some amount of time
       assert (Repo.all(Item) |> Enum.count) == 1
     end
   end

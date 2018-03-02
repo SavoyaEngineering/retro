@@ -33,7 +33,7 @@ class Rooms extends React.Component<any, any> {
     api.post('/api/rooms/go_to_room', data)
       .then((response) => {
         localStorage.setItem("roomToken", response.room_token);
-        window.location = '/rooms/' + room.id;
+        window.location = '/rooms/' + response.room_id;
       }, (errorResponse) => {
         console.log("error");
     });
