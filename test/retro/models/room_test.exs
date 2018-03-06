@@ -24,5 +24,17 @@ defmodule Retro.RoomTest do
       assert elem(Enum.at(errors, 1), 1) |> elem(0) === "Name required"
       assert (Repo.all(Room) |> Enum.count) === 0
     end
+
+    test "does not create multiple rooms with the same name" do
+      Room.create(%{name: "Accounting Retro", password: "super_secure"})
+      assert (Repo.all(Room) |> Enum.count) === 1
+
+
+      {:error, room} = Room.create(%{name: "Accounting Retro", password: "also_super_secure"})
+      errors = room.errors
+      assert Enum.count(errors) === 1
+      assert elem(Enum.at(errors, 0), 1) |> elem(0) === "Name has already been taken"
+      assert (Repo.all(Room) |> Enum.count) === 1
+    end
   end
 end

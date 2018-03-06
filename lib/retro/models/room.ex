@@ -17,6 +17,7 @@ defmodule Retro.Room do
     |> cast(attrs, [:name, :password, :temporary_token])
     |> validate_required([:name], message: "Name required")
     |> validate_required([:password], message: "Password required")
+    |> unique_constraint(:name, message: "Name has already been taken")
     |> hash_password()
   end
 

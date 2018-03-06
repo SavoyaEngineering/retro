@@ -132,7 +132,7 @@ defmodule RetroWeb.RetroControllerTest do
 
     test "sends error response when room token is for the wrong room", %{conn: conn} do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
-      {:ok, other_room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+      {:ok, other_room} = Room.create(%{name: "Other Dev Retro", password: "bethcatlover"})
 
       #setup the connection signed into that room
       {:ok, token, _} = RetroWeb.Guardian.encode_and_sign(room)
