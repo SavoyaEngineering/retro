@@ -27,6 +27,7 @@ defmodule RetroWeb.Router do
     pipe_through :api
     resources "/rooms", RoomController, only: [:index, :create]
     post "/rooms/go_to_room", RoomController, :go_to_room
+    post "/rooms/go_to_room_with_token", RoomController, :go_to_room_with_token
 
     scope "/" do
       pipe_through :api_authorized

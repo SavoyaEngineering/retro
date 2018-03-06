@@ -7,13 +7,6 @@ defmodule RetroWeb.RoomController do
   alias Retro.{Repo, Room, Item}
   alias RetroWeb.Guardian
 
-  def index(conn, _params) do
-    rooms =
-      Repo.all(Room)
-      |> Enum.map(fn (room) -> Room.as_json(room) end)
-    json(conn, %{rooms: rooms})
-  end
-
   def create(conn, %{"name" => name, "password" => password}) do
     case %{name: name, password: password}
          |> Room.create do
@@ -46,6 +39,19 @@ defmodule RetroWeb.RoomController do
         json(conn, go_to_room_response(room))
       {:error, _reason, conn} ->
         error_response(["Invalid credentials"], conn)
+    end
+  end
+
+  def go_to_room_with_token(conn, %{"temporary_token" => token}) do
+    room = if token != nil do
+      Repo.get_by(Room, temporary_token: token)
+    end
+
+    if room do
+      login(conn, room)
+      |> json(go_to_room_response(room))
+    else
+      error_response(["Invalid credentials"], conn)
     end
   end
 

@@ -4,21 +4,6 @@ defmodule RetroWeb.RetroControllerTest do
 
   alias Retro.{Repo, Room, Item}
 
-  describe "GET /rooms" do
-    test "when request for JSON it returns a list of rooms", %{conn: conn} do
-      {:ok, room1} = Room.create(%{name: "Accounting Retro", password: "bethcatlover"})
-      {:ok, room2} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
-
-
-      conn = get conn, "api/rooms"
-
-
-      assert json_response(conn, 200) == %{
-               "rooms" => [%{"id" => room1.id, "name" => "Accounting Retro"}, %{"id" => room2.id, "name" => "Dev Retro"}]
-             }
-    end
-  end
-
   describe "POST /rooms" do
     test "it responds to JSON and creates a room", %{conn: conn} do
       params = %{name: "RETRO", password: "bethcatlover"}
@@ -74,7 +59,49 @@ defmodule RetroWeb.RetroControllerTest do
     test "it returns error when no room is found", %{conn: conn} do
       {:ok, _room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
-      conn = post conn, "api/rooms/go_to_room/", %{name: "Wrong room", password: "wrong"}
+
+      conn = post conn, "api/rooms/go_to_room/", %{name: "Wrong room", password: "bethcatlover"}
+
+
+      assert json_response(conn, 422) == %{"errors" => ["Invalid credentials"]}
+    end
+  end
+
+  describe "POST /join_room_with_token" do
+    test "responds with the login info when a matching temporary_token is provided", %{conn: conn} do
+      {:ok, room} = Room.create(
+        %{name: "Dev Retro", password: "bethcatlover", temporary_token: "tok_123"}
+      )
+
+
+      conn = post conn, "api/rooms/go_to_room_with_token/", %{temporary_token: "tok_123"}
+
+
+      response  = json_response(conn, 200)
+      assert response["room_token"] != nil
+      assert response["room_id"] == room.id
+    end
+
+    test "responds with errors when a non-matching temporary_token is provided", %{conn: conn} do
+      {:ok, _room} = Room.create(
+        %{name: "Dev Retro", password: "bethcatlover", temporary_token: "tok_123"}
+      )
+
+
+      conn = post conn, "api/rooms/go_to_room_with_token/", %{temporary_token: "tok_122"}
+
+
+      assert json_response(conn, 422) == %{"errors" => ["Invalid credentials"]}
+    end
+
+    test "responds with errors when a nil temporary_token is provided", %{conn: conn} do
+      {:ok, _room} = Room.create(
+        %{name: "Dev Retro", password: "bethcatlover", temporary_token: nil}
+      )
+
+
+      conn = post conn, "api/rooms/go_to_room_with_token/", %{temporary_token: nil}
+
 
       assert json_response(conn, 422) == %{"errors" => ["Invalid credentials"]}
     end

@@ -7,13 +7,14 @@ defmodule Retro.Room do
     field :name, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+    field :temporary_token, :string
 
     timestamps()
   end
 
   def changeset(%Room{} = room, attrs \\ %{}) do
     room
-    |> cast(attrs, [:name, :password])
+    |> cast(attrs, [:name, :password, :temporary_token])
     |> validate_required([:name], message: "Name required")
     |> validate_required([:password], message: "Password required")
     |> hash_password()
