@@ -114,7 +114,8 @@ class Room extends React.Component<any, any> {
     this.setState({[type]: ""})
   }
 
-  focusItem(item) {
+  focusItem(item, event) {
+    event.preventDefault();
     this.channel.push("select_item", {item_id: item.id});
   };
 
