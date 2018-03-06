@@ -13,6 +13,7 @@ class Room extends React.Component<any, any> {
     this.state = {
       id: null,
       name: "",
+      emails: "",
       happyItems: [],
       middleItems: [],
       sadItems: [],
@@ -124,6 +125,14 @@ class Room extends React.Component<any, any> {
     this.channel.push("thumbs_up", {item_id: item.id})
   }
 
+  invite(event) {
+    event.preventDefault();
+    api.post("/api/rooms/" + this.state.id + "/invite", {emails: this.state.emails})
+      .then((response) => {
+        this.setState({emails: ""})
+      });
+  }
+
   render() {
     this.renderItems = function (items) {
       return items.map((item: object) =>
@@ -152,27 +161,40 @@ class Room extends React.Component<any, any> {
       <div>
         <div className="jumbotron">
           <h2>{this.state.name}</h2>
+          <p>Invite others to this Retro</p>
+          <div className="form-group">
+            <input type="text" className="form-control" placeholder="first@example.com, second@example.com"
+                   value={this.state.emails} onChange={this.handleTextChange.bind(this, "emails")}/>
+          </div>
+          <button className="btn btn-primary"
+                  onClick={this.invite.bind(this)}>Send Invite Email</button>
         </div>
-        <div className="retro-column form-group">
-          <input type="text" className="form-control" placeholder="Something happy"
-            value={this.state.happy_msg} onChange={this.handleTextChange.bind(this, "happy_msg")}/>
-          <button className="btn btn-primary btn-block"
+        <div className="retro-column">
+          <div className="form-group">
+            <input type="text" className="form-control" placeholder="Something happy"
+              value={this.state.happy_msg} onChange={this.handleTextChange.bind(this, "happy_msg")}/>
+          </div>
+          <button className="btn btn-primary"
                   onClick={this.addItem.bind(this, "happy_msg")}>Add Item</button>
           <hr/>
           {happyItems}
         </div>
-        <div className="retro-column form-group">
-          <input type="text" className="form-control" placeholder="Something meh"
-                 value={this.state.middle_msg} onChange={this.handleTextChange.bind(this, "middle_msg")}/>
-          <button className="btn btn-primary btn-block"
+        <div className="retro-column">
+          <div className="form-group">
+            <input type="text" className="form-control" placeholder="Something meh"
+                   value={this.state.middle_msg} onChange={this.handleTextChange.bind(this, "middle_msg")}/>
+          </div>
+          <button className="btn btn-primary"
                   onClick={this.addItem.bind(this, "middle_msg")}>Add Item</button>
           <hr/>
           {middleItems}
         </div>
-        <div className="retro-column form-group">
-          <input type="text" className="form-control" placeholder="Something sad"
-                 value={this.state.sad_msg} onChange={this.handleTextChange.bind(this, "sad_msg")}/>
-          <button className="btn btn-primary btn-block"
+        <div className="retro-column">
+          <div className="form-group">
+            <input type="text" className="form-control" placeholder="Something sad"
+                   value={this.state.sad_msg} onChange={this.handleTextChange.bind(this, "sad_msg")}/>
+          </div>
+          <button className="btn btn-primary"
                   onClick={this.addItem.bind(this, "sad_msg")}>Add Item</button>
           <hr/>
           {sadItems}

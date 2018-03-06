@@ -19,3 +19,7 @@ config :retro, Retro.Repo,
 config :retro, RetroWeb.Guardian,
        issuer: "retro",
        secret_key: "secret"
+
+config :sendgrid,
+       api_key: "fake_key"
+

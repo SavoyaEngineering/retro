@@ -62,3 +62,7 @@ config :retro, Retro.Repo,
 config :retro, RetroWeb.Guardian,
        issuer: "retro",
        secret_key: "secret"
+
+config :sendgrid,
+       api_key: System.get_env("SENDGRID_API_KEY")
+

@@ -4,15 +4,8 @@ defmodule RetroWeb.RoomController do
   import Comeonin.Argon2, only: [checkpw: 2, dummy_checkpw: 0]
   import Ecto.Query, only: [from: 2]
 
-  alias Retro.{Repo, Room, Item}
+  alias Retro.{Repo, Room, Item, Mailer}
   alias RetroWeb.Guardian
-
-  def index(conn, _params) do
-    rooms =
-      Repo.all(Room)
-      |> Enum.map(fn (room) -> Room.as_json(room) end)
-    json(conn, %{rooms: rooms})
-  end
 
   def create(conn, %{"name" => name, "password" => password}) do
     case %{name: name, password: password}
@@ -49,6 +42,19 @@ defmodule RetroWeb.RoomController do
     end
   end
 
+  def go_to_room_with_token(conn, %{"temporary_token" => token}) do
+    room = if token != nil do
+      Repo.get_by(Room, temporary_token: token)
+    end
+
+    if room do
+      login(conn, room)
+      |> json(go_to_room_response(room))
+    else
+      error_response(["Invalid credentials"], conn)
+    end
+  end
+
   def show(conn, %{"id" => id}) do
     room = Repo.get(Room, id)
     if room.id === current_room_for_conn(conn) do
@@ -61,6 +67,19 @@ defmodule RetroWeb.RoomController do
           items: items_for_room(room),
         }
       )
+    else
+      error_response(["Invalid token"], conn)
+    end
+  end
+
+  def invite(conn, %{"emails" => email_string, "id" => id}) do
+    room = Repo.get(Room, id)
+    if room.id === current_room_for_conn(conn) do
+      token = get_socket_token(conn, room.id)
+      room = Ecto.Changeset.change room, temporary_token: token
+      Repo.update room
+      Mailer.send_join_room_email(email_string, token)
+      json(conn, %{})
     else
       error_response(["Invalid token"], conn)
     end

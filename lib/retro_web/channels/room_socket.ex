@@ -24,7 +24,7 @@ defmodule RetroWeb.RoomSocket do
     case Phoenix.Token.verify(socket, "room socket", token, max_age: 1209600) do
       {:ok, room_id} ->
         {:ok, assign(socket, :current_user, room_id)}
-      {:error, reason} ->
+      {:error, _} ->
         :error
     end
   end

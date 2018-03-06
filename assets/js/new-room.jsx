@@ -1,7 +1,6 @@
 import * as React from "react"
 
 import api from './api';
-import Landing from "./landing";
 
 class NewRoom extends React.Component<any, any> {
   constructor(props: object) {

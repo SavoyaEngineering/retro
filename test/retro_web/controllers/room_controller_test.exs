@@ -4,21 +4,6 @@ defmodule RetroWeb.RetroControllerTest do
 
   alias Retro.{Repo, Room, Item}
 
-  describe "GET /rooms" do
-    test "when request for JSON it returns a list of rooms", %{conn: conn} do
-      {:ok, room1} = Room.create(%{name: "Accounting Retro", password: "bethcatlover"})
-      {:ok, room2} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
-
-
-      conn = get conn, "api/rooms"
-
-
-      assert json_response(conn, 200) == %{
-               "rooms" => [%{"id" => room1.id, "name" => "Accounting Retro"}, %{"id" => room2.id, "name" => "Dev Retro"}]
-             }
-    end
-  end
-
   describe "POST /rooms" do
     test "it responds to JSON and creates a room", %{conn: conn} do
       params = %{name: "RETRO", password: "bethcatlover"}
@@ -74,7 +59,49 @@ defmodule RetroWeb.RetroControllerTest do
     test "it returns error when no room is found", %{conn: conn} do
       {:ok, _room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
-      conn = post conn, "api/rooms/go_to_room/", %{name: "Wrong room", password: "wrong"}
+
+      conn = post conn, "api/rooms/go_to_room/", %{name: "Wrong room", password: "bethcatlover"}
+
+
+      assert json_response(conn, 422) == %{"errors" => ["Invalid credentials"]}
+    end
+  end
+
+  describe "POST /join_room_with_token" do
+    test "responds with the login info when a matching temporary_token is provided", %{conn: conn} do
+      {:ok, room} = Room.create(
+        %{name: "Dev Retro", password: "bethcatlover", temporary_token: "tok_123"}
+      )
+
+
+      conn = post conn, "api/rooms/go_to_room_with_token/", %{temporary_token: "tok_123"}
+
+
+      response  = json_response(conn, 200)
+      assert response["room_token"] != nil
+      assert response["room_id"] == room.id
+    end
+
+    test "responds with errors when a non-matching temporary_token is provided", %{conn: conn} do
+      {:ok, _room} = Room.create(
+        %{name: "Dev Retro", password: "bethcatlover", temporary_token: "tok_123"}
+      )
+
+
+      conn = post conn, "api/rooms/go_to_room_with_token/", %{temporary_token: "tok_122"}
+
+
+      assert json_response(conn, 422) == %{"errors" => ["Invalid credentials"]}
+    end
+
+    test "responds with errors when a nil temporary_token is provided", %{conn: conn} do
+      {:ok, _room} = Room.create(
+        %{name: "Dev Retro", password: "bethcatlover", temporary_token: nil}
+      )
+
+
+      conn = post conn, "api/rooms/go_to_room_with_token/", %{temporary_token: nil}
+
 
       assert json_response(conn, 422) == %{"errors" => ["Invalid credentials"]}
     end
@@ -103,22 +130,6 @@ defmodule RetroWeb.RetroControllerTest do
       assert Enum.count(response["items"]) === 1
     end
 
-    test "sends error response when room token is bad", %{conn: conn} do
-      {:ok, _} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
-      {:ok, other_room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
-
-      #setup the connection signed into that room
-      conn = conn
-             |> put_req_header("accept", "application/json")
-             |> put_req_header("authorization", "Bearer: wrong")
-
-
-      conn = get conn, "api/rooms/#{other_room.id}"
-
-
-      response(conn, 401)
-    end
-
     test "sends error response when room token is for the wrong room", %{conn: conn} do
       {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
       {:ok, other_room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
@@ -134,6 +145,26 @@ defmodule RetroWeb.RetroControllerTest do
 
 
       assert json_response(conn, 422) === %{"errors" => ["Invalid token"]}
+    end
+  end
+
+  describe "POST /rooms/:id/invite" do
+    test "it sends email invite to list of recipients", %{conn: conn} do
+      {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+
+      #setup the connection signed into that room
+      {:ok, token, _} = RetroWeb.Guardian.encode_and_sign(room)
+      conn = conn
+             |> put_req_header("accept", "application/json")
+             |> put_req_header("authorization", "Bearer: #{token}")
+
+
+      conn = post conn, "api/rooms/#{room.id}/invite", %{emails: "fake@example.com, fake2@exampl.com"}
+
+
+      reloaded_room = Repo.get(Room, room.id)
+      {:ok, _} = Phoenix.Token.verify(conn, "room socket", reloaded_room.temporary_token, max_age: 1209600)
+      #TODO test the email was sent, Jose says no stubs.
     end
   end
 end
