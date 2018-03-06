@@ -33,7 +33,7 @@ class Room extends React.Component<any, any> {
       this.setState({
         happyItems: this.itemsForColumn("happy_msg"),
         middleItems: this.itemsForColumn("middle_msg"),
-        sadItems: this.itemsForColumn("sad_msg"),
+        sadItems: this.itemsForColumn("sad_msg")
       })
     };
 
@@ -100,6 +100,8 @@ class Room extends React.Component<any, any> {
           .receive("error", resp => {
             console.log("Unable to join", resp)
           });
+      }, () => {
+        window.location = "/404";
       });
   }
 
