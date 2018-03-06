@@ -39,7 +39,7 @@ config :retro, RetroWeb.Guardian,
        secret_key: "${GUARDIAN_KEY}"
 
 config :sendgrid,
-       api_key: System.get_env("SENDGRID_API_KEY")
+       api_key: "${SENDGRID_API_KEY}"
 
 # Do not print debug messages in production
 config :logger, level: :info
