@@ -1,12 +1,22 @@
 /* This file is for your main application scss. */
 @import '~bootstrap/dist/css/bootstrap.min.css';
 .logo {
-  width: 100%;
-  height: 180px;
-  display: inline-block;
-  margin-bottom: 1em;
-  background-image: url("/images/retro.png");
-  background-size: 100% 180px;
+    left:0;
+    top:0;
+    height:100%;
+    position: relative;
+}
+
+.background-logo {
+    background: url("/images/retro.svg") center;
+    background-repeat: no-repeat;
+    background-size: 50%;
+}
+
+.jumbotron {
+    h2 {
+        color: #553E4E;
+    }
 }
 
 .retro-column {
@@ -21,4 +31,24 @@
 
 .clickable {
     cursor: pointer;
+}
+
+
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary {
+    color: #A30015;
+    background-color: #fff;
+    border-color: #A30015;
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #A30015;
+    border-color: #A30015;
+}
+
+a {
+    color: #A30015;
+    text-decoration: none;
 }

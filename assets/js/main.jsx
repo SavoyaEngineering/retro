@@ -6,6 +6,46 @@ import Landing from "./landing";
 import RoomRouter from "./room-router";
 import ErrorPage from "./error-page";
 
+class NavBar extends React.Component<any, any> {
+  constructor(props: object) {
+    super(props);
+    this.roomId = localStorage.getItem("roomId");
+    this.roomLink = "/rooms/" + this.roomId;
+  }
+
+  render() {
+    return (
+      <header className="header">
+        <nav className="navbar navbar-default">
+          <div className="container-fluid">
+            <div className="navbar-header">
+              <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span className="sr-only">Toggle navigation</span>
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+              </button>
+              <a className="navbar-brand" href="/">
+                <img className="logo" alt="Retro" src="../images/retro.svg"/>
+              </a>
+            </div>
+            <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul className="nav navbar-nav">
+                <li><a href="/rooms/new">Create A Retro</a></li>
+              </ul>
+              {this.roomId &&
+              <ul className="nav navbar-nav navbar-right">
+                <li><a href={this.roomLink}>My Retro</a></li>
+              </ul>
+              }
+            </div>
+          </div>
+        </nav>
+      </header>
+    )
+  }
+};
+
 
 const Main = () => (
   <main>
@@ -19,6 +59,9 @@ const Main = () => (
 
 ReactDOM.render((
   <BrowserRouter>
-    <Main/>
+    <div className="container">
+      <NavBar/>
+      <Main/>
+    </div>
   </BrowserRouter>
 ), document.getElementById('main'));

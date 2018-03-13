@@ -9,6 +9,7 @@ class JoinRoom extends React.Component<any, any> {
     var data: object = {temporary_token: token};
     api.post('/api/rooms/go_to_room_with_token', data)
       .then((response) => {
+        localStorage.setItem("roomId", response.room_id);
         localStorage.setItem("roomToken", response.room_token);
         window.location = '/rooms/' + response.room_id;
       }, (errorResponse) => {

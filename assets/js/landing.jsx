@@ -22,6 +22,7 @@ class Landing extends React.Component<any, any> {
     var data:object = {name: this.state.name, password: this.state.password};
     api.post('/api/rooms/go_to_room', data)
       .then((response) => {
+        localStorage.setItem("roomId", response.room_id);
         localStorage.setItem("roomToken", response.room_token);
         window.location = '/rooms/' + response.room_id;
       }, (errorResponse) => {
