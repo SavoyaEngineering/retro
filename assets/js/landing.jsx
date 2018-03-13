@@ -36,7 +36,7 @@ class Landing extends React.Component<any, any> {
     return (
       <div>
         <div className="jumbotron">
-          <h2>Retro provides a space for retroactive meetings.</h2>
+          <h2>Retro provides a space for collaborative retroactive meetings.</h2>
           <p>Login to your Retro.</p>
         </div>
 

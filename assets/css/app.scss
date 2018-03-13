@@ -13,10 +13,8 @@
     background-size: 50%;
 }
 
-.jumbotron {
-    h2 {
-        color: #553E4E;
-    }
+h2, h3 {
+    color: #553E4E;
 }
 
 .retro-column {
@@ -51,4 +49,17 @@
 a {
     color: #A30015;
     text-decoration: none;
+}
+a:hover {
+    color: #A30015;
+    text-decoration: underline;
+}
+
+.seperator {
+    border:none;
+    border-top:3px dotted #553E4E;
+    color:#553E4E;
+    background-color:#fff;
+    height:1px;
+    width:75%;
 }

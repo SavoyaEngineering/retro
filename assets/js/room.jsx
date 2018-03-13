@@ -17,10 +17,13 @@ class Room extends React.Component<any, any> {
       happyItems: [],
       middleItems: [],
       sadItems: [],
+      actionItems: [],
       allItems: [],
       happy_msg: "",
       middle_msg: "",
-      sad_msg: ""
+      sad_msg: "",
+      action_msg: "",
+      showInvite: false
     };
 
     this.itemsForColumn = function (type: string) {
@@ -33,7 +36,8 @@ class Room extends React.Component<any, any> {
       this.setState({
         happyItems: this.itemsForColumn("happy_msg"),
         middleItems: this.itemsForColumn("middle_msg"),
-        sadItems: this.itemsForColumn("sad_msg")
+        sadItems: this.itemsForColumn("sad_msg"),
+        actionItems: this.itemsForColumn("action_msg"),
       })
     };
 
@@ -110,6 +114,7 @@ class Room extends React.Component<any, any> {
   }
 
   addItem(type: string) {
+    console.log(this.state[type]);
     this.channel.push(type, {body: this.state[type], room_id: this.state.id});
     this.setState({[type]: ""})
   }
@@ -128,28 +133,33 @@ class Room extends React.Component<any, any> {
     this.channel.push("thumbs_up", {item_id: item.id})
   }
 
+  showInvite(event) {
+    event.preventDefault();
+    this.setState({showInvite: !this.state.showInvite})
+  }
+
   invite(event) {
     event.preventDefault();
     api.post("/api/rooms/" + this.state.id + "/invite", {emails: this.state.emails})
-      .then((response) => {
-        this.setState({emails: ""})
+      .then(() => {
+        this.setState({emails: "", showInvite: false})
       });
   }
 
   render() {
-    this.renderItems = function (items) {
+    this.renderItems = function (items, skipThumbsUp) {
       return items.map((item: object) =>
         <div className="thumbnail" key={item.id}>
           <div className={item.selected ? "caption selected-item" : "caption"} id={item.id}>
             <a onClick={this.focusItem.bind(this, item)} className="center-block" href="#">
               {item.text}
             </a>
-            {!item.selected &&
+            {(!item.selected && !skipThumbsUp) &&
             <button className="btn-sm btn-secondary"
                     onClick={this.thumbsUp.bind(this, item)}>+{item.thumbs_up_count}</button>
             }
             {item.selected &&
-            <button className="btn btn-primary btn-block"
+            <button className="btn btn-primary"
                     onClick={this.archiveItem.bind(this, item)}>Archive</button>
             }
           </div>
@@ -160,47 +170,69 @@ class Room extends React.Component<any, any> {
     const happyItems = this.renderItems(this.state.happyItems);
     const middleItems = this.renderItems(this.state.middleItems);
     const sadItems = this.renderItems(this.state.sadItems);
+    const actionItems = this.renderItems(this.state.actionItems, true);
     return (
       <div>
         <div className="jumbotron">
           <h2>{this.state.name}</h2>
-          <p>Invite others to this Retro</p>
-          <div className="form-group">
-            <input type="text" className="form-control" placeholder="first@example.com, second@example.com"
-                   value={this.state.emails} onChange={this.handleTextChange.bind(this, "emails")}/>
-          </div>
-          <button className="btn btn-primary"
-                  onClick={this.invite.bind(this)}>Send Invite Email</button>
+          <p>
+            <a onClick={this.showInvite.bind(this)} className="clickable">Invite others to this Retro</a>
+          </p>
+          {this.state.showInvite &&
+            <div>
+              <div className="form-group">
+                <input type="text" className="form-control" placeholder="first@example.com, second@example.com"
+                       value={this.state.emails} onChange={this.handleTextChange.bind(this, "emails")}/>
+              </div>
+              <button className="btn btn-primary"
+                      onClick={this.invite.bind(this)}>Send Invite Email</button>
+            </div>
+          }
         </div>
-        <div className="retro-column">
-          <div className="form-group">
-            <input type="text" className="form-control" placeholder="Something happy"
-              value={this.state.happy_msg} onChange={this.handleTextChange.bind(this, "happy_msg")}/>
+        <div className="row">
+          <h3>Retro Items</h3>
+          <div className="retro-column">
+            <div className="form-group">
+              <input type="text" className="form-control" placeholder="Something happy"
+                value={this.state.happy_msg} onChange={this.handleTextChange.bind(this, "happy_msg")}/>
+            </div>
+            <button className="btn btn-primary"
+                    onClick={this.addItem.bind(this, "happy_msg")}>Add Item</button>
+            <hr/>
+            {happyItems}
           </div>
-          <button className="btn btn-primary"
-                  onClick={this.addItem.bind(this, "happy_msg")}>Add Item</button>
-          <hr/>
-          {happyItems}
+          <div className="retro-column">
+            <div className="form-group">
+              <input type="text" className="form-control" placeholder="Something meh"
+                     value={this.state.middle_msg} onChange={this.handleTextChange.bind(this, "middle_msg")}/>
+            </div>
+            <button className="btn btn-primary"
+                    onClick={this.addItem.bind(this, "middle_msg")}>Add Item</button>
+            <hr/>
+            {middleItems}
+          </div>
+          <div className="retro-column">
+            <div className="form-group">
+              <input type="text" className="form-control" placeholder="Something sad"
+                     value={this.state.sad_msg} onChange={this.handleTextChange.bind(this, "sad_msg")}/>
+            </div>
+            <button className="btn btn-primary"
+                    onClick={this.addItem.bind(this, "sad_msg")}>Add Item</button>
+            <hr/>
+            {sadItems}
+          </div>
         </div>
-        <div className="retro-column">
+        <hr className="seperator"/>
+        <div className="row">
+          <h3>Action Items</h3>
           <div className="form-group">
-            <input type="text" className="form-control" placeholder="Something meh"
-                   value={this.state.middle_msg} onChange={this.handleTextChange.bind(this, "middle_msg")}/>
+            <textarea type="text" className="form-control" placeholder="What do we need to remember to do next week?"
+                   value={this.state.action_msg} onChange={this.handleTextChange.bind(this, "action_msg")}/>
           </div>
           <button className="btn btn-primary"
-                  onClick={this.addItem.bind(this, "middle_msg")}>Add Item</button>
+                  onClick={this.addItem.bind(this, "action_msg")}>Add Action Item</button>
           <hr/>
-          {middleItems}
-        </div>
-        <div className="retro-column">
-          <div className="form-group">
-            <input type="text" className="form-control" placeholder="Something sad"
-                   value={this.state.sad_msg} onChange={this.handleTextChange.bind(this, "sad_msg")}/>
-          </div>
-          <button className="btn btn-primary"
-                  onClick={this.addItem.bind(this, "sad_msg")}>Add Item</button>
-          <hr/>
-          {sadItems}
+          {actionItems}
         </div>
       </div>
     )
