@@ -23,7 +23,8 @@ class Room extends React.Component<any, any> {
       middle_msg: "",
       sad_msg: "",
       action_msg: "",
-      showInvite: false
+      showInvite: false,
+      members: [],
     };
 
     this.itemsForColumn = function (type: string) {
@@ -41,72 +42,79 @@ class Room extends React.Component<any, any> {
       })
     };
 
-    api.fetch('/api/rooms/' + id)
-      .then((response) => {
-        this.setState({
-          id: response.id,
-          name: response.name,
-          allItems: response.items,
-          socketToken: response.socket_token
+    this.getMembers = function () {
+      api.fetch('/api/rooms/' + id + '/members').then((response) => {
+        this.setState({members: response.members});
+      });
+    };
+
+    api.fetch('/api/rooms/' + id).then((response) => {
+      this.setState({
+        id: response.id,
+        name: response.name,
+        allItems: response.items,
+        socketToken: response.socket_token
+      });
+
+      this.setupColumnItems(this);
+
+      //setup socket connection
+      let socket = new Socket("/socket", {params: {token: this.state.socketToken}});
+      socket.connect();
+      this.channel = socket.channel("room:" + response.id, {});
+
+      //setup listener for when a retro item is selected
+      this.channel.on("select_item", payload => {
+        this.state.allItems.map(item => {
+          item.selected = payload.item_id === item.id;
         });
 
         this.setupColumnItems(this);
-
-        //setup socket connection
-        let socket = new Socket("/socket", {params: {token: this.state.socketToken}});
-        socket.connect();
-        this.channel = socket.channel("room:" + response.id, {});
-
-        //setup listener for when a retro item is selected
-        this.channel.on("select_item", payload => {
-          this.state.allItems.map(item => {
-            item.selected = payload.item_id === item.id;
-          });
-
-          this.setupColumnItems(this);
-        });
-
-        //setup listener for when an item is archived
-        this.channel.on("archive_item", payload => {
-          this.setState({
-            allItems: this.state.allItems.filter(item => {
-              if (item.id !== payload.item_id) {
-                return item;
-              }
-            })
-          });
-          this.setupColumnItems();
-        });
-
-        //setup thumbs up listener
-        this.channel.on("thumbs_up", payload => {
-          this.setState({
-            allItems: this.state.allItems.map(item => {
-              if (item.id === payload.item_id) {
-                item.thumbs_up_count += 1;
-              }
-              return item
-            })
-          });
-        });
-
-        //setup new msg listener
-        this.channel.on("new_msg", payload => {
-          this.state.allItems.push(payload);
-          this.setupColumnItems();
-        });
-
-        //join the channel
-        this.channel.join()
-          .receive("ok", resp => {
-            console.log("Joined successfully", resp)
-          })
-          .receive("error", resp => {
-            console.log("Unable to join", resp)
-          });
-      }, () => {
-        window.location = "/404";
       });
+
+      //setup listener for when an item is archived
+      this.channel.on("archive_item", payload => {
+        this.setState({
+          allItems: this.state.allItems.filter(item => {
+            if (item.id !== payload.item_id) {
+              return item;
+            }
+          })
+        });
+        this.setupColumnItems();
+      });
+
+      //setup thumbs up listener
+      this.channel.on("thumbs_up", payload => {
+        this.setState({
+          allItems: this.state.allItems.map(item => {
+            if (item.id === payload.item_id) {
+              item.thumbs_up_count += 1;
+            }
+            return item
+          })
+        });
+      });
+
+      //setup new msg listener
+      this.channel.on("new_msg", payload => {
+        this.state.allItems.push(payload);
+        this.setupColumnItems();
+      });
+
+      //join the channel
+      this.channel.join()
+        .receive("ok", resp => {
+          console.log("Joined successfully", resp)
+        })
+        .receive("error", resp => {
+          console.log("Unable to join", resp)
+        });
+    }, () => {
+      window.location = "/404";
+    });
+
+    this.getMembers();
   }
 
   handleTextChange(type: string, event) {
@@ -114,7 +122,6 @@ class Room extends React.Component<any, any> {
   }
 
   addItem(type: string) {
-    console.log(this.state[type]);
     this.channel.push(type, {body: this.state[type], room_id: this.state.id});
     this.setState({[type]: ""})
   }
@@ -140,9 +147,10 @@ class Room extends React.Component<any, any> {
 
   invite(event) {
     event.preventDefault();
-    api.post("/api/rooms/" + this.state.id + "/invite", {emails: this.state.emails})
+    api.post("/api/rooms/" + this.state.id + "/members/invite", {emails: this.state.emails})
       .then(() => {
-        this.setState({emails: "", showInvite: false})
+        this.setState({emails: "", showInvite: false});
+        this.getMembers();
       });
   }
 
@@ -167,30 +175,43 @@ class Room extends React.Component<any, any> {
       )
     };
 
+    this.memberEmails = function () {
+      if (this.state.members !== []) {
+        return this.state.members.map(member => member.email).join(", ")
+      } else {
+        return "No one";
+      }
+    };
+
     const happyItems = this.renderItems(this.state.happyItems);
     const middleItems = this.renderItems(this.state.middleItems);
     const sadItems = this.renderItems(this.state.sadItems);
     const actionItems = this.renderItems(this.state.actionItems, true);
     return (
       <div>
-        <div className="jumbotron">
-          <h2>{this.state.name}</h2>
-          <p>
-            <a onClick={this.showInvite.bind(this)} className="clickable">Invite others to this Retro</a>
-          </p>
-          {this.state.showInvite &&
-            <div>
-              <div className="form-group">
-                <input type="text" className="form-control" placeholder="first@example.com, second@example.com"
-                       value={this.state.emails} onChange={this.handleTextChange.bind(this, "emails")}/>
+        <div className="jumbotron row">
+          <div className="col-md-2">
+            <img className="logo-landing" alt="Retro" src="../images/retro.svg"/>
+          </div>
+          <div className="col-md-10">
+            <h2>{this.state.name}</h2>
+            <p>
+              <a onClick={this.showInvite.bind(this)} className="clickable">Invite others to this Retro</a>
+            </p>
+            {this.state.showInvite &&
+              <div>
+                <p>Invitations have been sent to: {this.memberEmails()}</p>
+                <div className="form-group">
+                  <input type="text" className="form-control" placeholder="first@example.com, second@example.com"
+                         value={this.state.emails} onChange={this.handleTextChange.bind(this, "emails")}/>
+                </div>
+                <button className="btn btn-primary"
+                        onClick={this.invite.bind(this)}>Send Invite Email</button>
               </div>
-              <button className="btn btn-primary"
-                      onClick={this.invite.bind(this)}>Send Invite Email</button>
-            </div>
-          }
+            }
+          </div>
         </div>
         <div className="row">
-          <h3>Retro Items</h3>
           <div className="retro-column">
             <div className="form-group">
               <input type="text" className="form-control" placeholder="Something happy"

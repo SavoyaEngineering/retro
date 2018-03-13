@@ -23,6 +23,9 @@ defmodule RetroWeb do
       import Plug.Conn
       import RetroWeb.Router.Helpers
       import RetroWeb.Gettext
+
+      import Ecto.Query, only: [from: 2]
+      import RetroWeb.ControllerHelper
     end
   end
 

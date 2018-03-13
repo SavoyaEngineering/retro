@@ -35,9 +35,14 @@ class NewRoom extends React.Component<any, any> {
     const errors = this.state.errors.map((error: string) => <div className="text-danger" key={error}>{error}</div>);
     return (
       <div>
-        <div className='jumbotron'>
-          <h2>Create a Retro for you and your friends.</h2>
-          <p>A Retro is a room for collaborative meetings. Choose a name and password to get started.</p>
+        <div className="jumbotron row">
+          <div className="col-md-2">
+            <img className="logo-landing" alt="Retro" src="../images/retro.svg"/>
+          </div>
+          <div className="col-md-10">
+            <h2>Create a Retro for you and your friends.</h2>
+            <p>A Retro is a room for collaborative meetings. Choose a name and password to get started.</p>
+          </div>
         </div>
         <form onSubmit={this.handleSubmit} className="col-md-4 col-md-offset-4">
           <div>

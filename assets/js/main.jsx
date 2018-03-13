@@ -15,8 +15,8 @@ class NavBar extends React.Component<any, any> {
 
   render() {
     return (
-      <header className="header">
-        <nav className="navbar navbar-default">
+      <nav className="navbar navbar-default">
+        <div className="container">
           <div className="container-fluid">
             <div className="navbar-header">
               <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -40,26 +40,26 @@ class NavBar extends React.Component<any, any> {
               }
             </div>
           </div>
-        </nav>
-      </header>
+        </div>
+      </nav>
     )
   }
 };
 
 
 const Main = () => (
-  <main>
+  <div className="container main">
     <Switch>
       <Route exact path='/' component={Landing}/>
       <Route path='/rooms' component={RoomRouter}/>
       <Route path='/404' component={ErrorPage}/>
     </Switch>
-  </main>
+  </div>
 );
 
 ReactDOM.render((
   <BrowserRouter>
-    <div className="container">
+    <div>
       <NavBar/>
       <Main/>
     </div>

@@ -35,9 +35,14 @@ class Landing extends React.Component<any, any> {
     const errors = this.state.errors.map((error: string) => <div className="text-danger" key={error}>{error}</div>);
     return (
       <div>
-        <div className="jumbotron">
-          <h2>Retro provides a space for collaborative retroactive meetings.</h2>
-          <p>Login to your Retro.</p>
+        <div className="jumbotron row">
+          <div className="col-md-2">
+            <img className="logo-landing" alt="Retro" src="../images/retro.svg"/>
+          </div>
+          <div className="col-md-10">
+            <h2>Retro provides a space for collaborative retroactive meetings.</h2>
+            <p>Login to your Retro.</p>
+          </div>
         </div>
 
         <form onSubmit={this.goToRoom} className="col-md-4 col-md-offset-4">

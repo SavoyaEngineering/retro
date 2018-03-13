@@ -2,10 +2,9 @@ defmodule RetroWeb.RoomController do
   use RetroWeb, :controller
 
   import Comeonin.Argon2, only: [checkpw: 2, dummy_checkpw: 0]
-  import Ecto.Query, only: [from: 2]
 
-  alias Retro.{Repo, Room, Item, Mailer}
-  alias RetroWeb.Guardian
+  alias Retro.{Repo, Room, Item}
+  alias RetroWeb.{Guardian, AuthHelper}
 
   def create(conn, %{"name" => name, "password" => password}) do
     case %{name: name, password: password}
@@ -57,29 +56,16 @@ defmodule RetroWeb.RoomController do
 
   def show(conn, %{"id" => id}) do
     room = Repo.get(Room, id)
-    if room.id === current_room_for_conn(conn) do
+    if room.id === AuthHelper.current_room_for_conn(conn) do
       json(
         conn,
         %{
           id: room.id,
           name: room.name,
-          socket_token: get_socket_token(conn, room.id),
+          socket_token: AuthHelper.get_socket_token(conn, room.id),
           items: items_for_room(room),
         }
       )
-    else
-      error_response(["Invalid token"], conn)
-    end
-  end
-
-  def invite(conn, %{"emails" => email_string, "id" => id}) do
-    room = Repo.get(Room, id)
-    if room.id === current_room_for_conn(conn) do
-      token = get_socket_token(conn, room.id)
-      room = Ecto.Changeset.change room, temporary_token: token
-      Repo.update room
-      Mailer.send_join_room_email(email_string, token)
-      json(conn, %{})
     else
       error_response(["Invalid token"], conn)
     end
@@ -98,16 +84,7 @@ defmodule RetroWeb.RoomController do
     {:ok, token, _} = RetroWeb.Guardian.encode_and_sign(room)
     token
   end
-
-  defp get_socket_token(conn, room_id) do
-    Phoenix.Token.sign(conn, "room socket", room_id)
-  end
-
-  def current_room_for_conn(conn) do
-    {id, _} = Integer.parse(Guardian.Plug.current_resource(conn)[:id])
-    id
-  end
-
+  
   defp items_for_room(room) do
     from(
       item in Item,
@@ -122,11 +99,5 @@ defmodule RetroWeb.RoomController do
   defp readable_error(error) do
     elem(error, 1)
     |> elem(0)
-  end
-
-  defp error_response(errors, conn) do
-    conn
-    |> put_status(422)
-    |> json(%{errors: errors})
   end
 end
