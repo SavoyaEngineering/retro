@@ -198,7 +198,7 @@ class Room extends React.Component<any, any> {
       if (this.state.members !== []) {
         return this.state.members.map(member => member.email).join(", ")
       } else {
-        return "No one";
+        return "No members yet";
       }
     };
 
