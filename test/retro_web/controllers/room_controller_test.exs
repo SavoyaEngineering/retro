@@ -109,7 +109,9 @@ defmodule RetroWeb.RoomControllerTest do
 
   describe "GET /rooms/:id" do
     test "it loads data for the room", %{conn: conn} do
-      {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
+      {:ok, room} = Room.create(
+        %{name: "Dev Retro", password: "bethcatlover", retro_day: "Friday", retro_time: "1100"}
+      )
 
       Item.create(%{room_id: room.id, type: "happy_msg", text: "JH - foosball table", archived: false})
       Item.create(%{room_id: room.id, type: "happy_msg", text: "JH - archived", archived: true})
@@ -125,9 +127,13 @@ defmodule RetroWeb.RoomControllerTest do
 
 
       response = json_response(conn, 200)
-      assert response["name"] === "Dev Retro"
-      assert response["socket_token"] !== nil
-      assert Enum.count(response["items"]) === 1
+      room_response = response["room"]
+      assert room_response["id"] === room.id
+      assert room_response["name"] === "Dev Retro"
+      assert room_response["retro_time"] === "1100"
+      assert room_response["retro_day"] === "Friday"
+      assert room_response["socket_token"] !== nil
+      assert Enum.count(room_response["items"]) === 1
     end
 
     test "sends error response when room token is for the wrong room", %{conn: conn} do
@@ -145,6 +151,31 @@ defmodule RetroWeb.RoomControllerTest do
 
 
       assert json_response(conn, 422) === %{"errors" => ["Invalid token"]}
+    end
+  end
+
+  describe "PUT /rooms/:id" do
+    test "it can update retro_day and retro_time", %{conn: conn} do
+      {:ok, room} = Room.create(
+        %{name: "Dev Retro", password: "bethcatlover", retro_day: "Friday", retro_time: "1100"}
+      )
+
+      #setup the connection signed into that room
+      {:ok, token, _} = RetroWeb.Guardian.encode_and_sign(room)
+      conn = conn
+             |> put_req_header("accept", "application/json")
+             |> put_req_header("authorization", "Bearer: #{token}")
+
+
+      conn = put conn, "api/rooms/#{room.id}", %{retro_day: "Saturday", retro_time: "1200", name: "can't update"}
+
+
+      response = json_response(conn, 200)
+      room_response = response["room"]
+      assert room_response["id"] === room.id
+      assert room_response["name"] === "Dev Retro"
+      assert room_response["retro_time"] === "1200"
+      assert room_response["retro_day"] === "Saturday"
     end
   end
 end

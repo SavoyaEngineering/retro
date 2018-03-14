@@ -31,7 +31,7 @@ config :retro, RetroWeb.Endpoint,
 #     https: [port: 4000, keyfile: "priv/server.key", certfile: "priv/server.pem"],
 #
 # If desired, both `http:` and `https:` keys can be
-# configured to run both http and https servers on
+# configured to run both http and https workers on
 # different ports.
 
 # Watch static and templates for browser reloading.

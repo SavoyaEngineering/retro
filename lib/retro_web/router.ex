@@ -31,7 +31,7 @@ defmodule RetroWeb.Router do
 
     scope "/" do
       pipe_through :api_authorized
-      resources "/rooms", RoomController, only: [:show] do
+      resources "/rooms", RoomController, only: [:show, :update] do
         resources "/members", MemberController, only: [:index]
         post "/members/invite", MemberController, :invite
       end

@@ -60,10 +60,37 @@ defmodule RetroWeb.RoomController do
       json(
         conn,
         %{
-          id: room.id,
-          name: room.name,
-          socket_token: AuthHelper.get_socket_token(conn, room.id),
-          items: items_for_room(room),
+          room: %{
+            id: room.id,
+            name: room.name,
+            retro_day: room.retro_day,
+            retro_time: room.retro_time,
+            socket_token: AuthHelper.get_socket_token(conn, room.id),
+            items: items_for_room(room),
+          }
+        }
+      )
+    else
+      error_response(["Invalid token"], conn)
+    end
+  end
+
+  def update(conn, params) do
+    room = Repo.get(Room, params["id"])
+    if room.id === AuthHelper.current_room_for_conn(conn) do
+      {:ok, updated_room} =
+        Ecto.Changeset.change(room, %{retro_day: params["retro_day"], retro_time: params["retro_time"]})
+        |> Repo.update
+
+      json(
+        conn,
+        %{
+          room: %{
+            id: updated_room.id,
+            name: updated_room.name,
+            retro_day: updated_room.retro_day,
+            retro_time: updated_room.retro_time,
+          }
         }
       )
     else

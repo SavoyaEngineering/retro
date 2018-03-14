@@ -42,4 +42,14 @@ export default {
         })
             .then(parseResponse);
     },
+    put(url, data) {
+        const body = JSON.stringify(data);
+
+        return fetch(`${url}`, {
+            method: 'PUT',
+            headers: headers(),
+            body,
+        })
+            .then(parseResponse);
+    },
 };

@@ -8,13 +8,15 @@ defmodule Retro.Room do
     field :password, :string, virtual: true
     field :password_hash, :string
     field :temporary_token, :string
+    field :retro_day, :string
+    field :retro_time, :string
 
     timestamps()
   end
 
   def changeset(%Room{} = room, attrs \\ %{}) do
     room
-    |> cast(attrs, [:name, :password, :temporary_token])
+    |> cast(attrs, [:name, :password, :temporary_token, :retro_day, :retro_time])
     |> validate_required([:name], message: "Name required")
     |> validate_required([:password], message: "Password required")
     |> unique_constraint(:name, message: "Name has already been taken")
