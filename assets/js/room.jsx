@@ -75,25 +75,30 @@ class Room extends React.Component<any, any> {
 
       //setup listener for when an item is archived
       this.channel.on("archive_item", payload => {
+        var room = this.state.room;
+        room.items = this.state.room.items.filter(item => {
+          if (item.id !== payload.item_id) {
+            return item;
+          }
+        });
+
         this.setState({
-          allItems: this.state.room.items.filter(item => {
-            if (item.id !== payload.item_id) {
-              return item;
-            }
-          })
+          room: room
         });
         this.setupColumnItems();
       });
 
       //setup thumbs up listener
       this.channel.on("thumbs_up", payload => {
+        var room = this.state.room;
+        room.items = this.state.room.items.map(item => {
+          if (item.id === payload.item_id) {
+            item.thumbs_up_count += 1;
+          }
+          return item
+        });
         this.setState({
-          allItems: this.state.room.items.map(item => {
-            if (item.id === payload.item_id) {
-              item.thumbs_up_count += 1;
-            }
-            return item
-          })
+          room: room
         });
       });
 
