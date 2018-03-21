@@ -52,4 +52,11 @@ export default {
         })
             .then(parseResponse);
     },
+    destroy(url) {
+        return fetch(`${url}`, {
+            method: 'DELETE',
+            headers: headers()
+        })
+            .then(parseResponse);
+    },
 };

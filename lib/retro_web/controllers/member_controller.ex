@@ -23,7 +23,7 @@ defmodule RetroWeb.MemberController do
     if room.id === AuthHelper.current_room_for_conn(conn) do
       token = AuthHelper.get_socket_token(conn, room.id)
       changeset = Ecto.Changeset.change room, temporary_token: token
-      Repo.update changeset
+      Repo.update(changeset)
 
       emails =
         String.split(email_string, ",")
@@ -32,6 +32,17 @@ defmodule RetroWeb.MemberController do
       Member.add_members(room, emails)
 
       Mailer.send_join_room_email(emails, token)
+      json(conn, %{})
+    else
+      error_response(["Invalid token"], conn)
+    end
+  end
+
+  def delete(conn, %{"id" => member_id, "room_id" => room_id}) do
+    room = Repo.get(Room, room_id)
+    if room.id === AuthHelper.current_room_for_conn(conn) do
+      member = Repo.get!(Member, member_id)
+      Repo.delete(member)
       json(conn, %{})
     else
       error_response(["Invalid token"], conn)

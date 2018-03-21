@@ -5,6 +5,7 @@ import {BrowserRouter} from 'react-router-dom';
 import Landing from "./landing";
 import RoomRouter from "./room-router";
 import ErrorPage from "./error-page";
+import LogoImg from "../static/images/retro.svg";
 
 class NavBar extends React.Component<any, any> {
   constructor(props: object) {
@@ -26,7 +27,7 @@ class NavBar extends React.Component<any, any> {
                 <span className="icon-bar"></span>
               </button>
               <a className="navbar-brand" href="/">
-                <img className="logo" alt="Retro" src="../images/retro.svg"/>
+                <img className="logo" alt="Retro" src={LogoImg}/>
               </a>
             </div>
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">

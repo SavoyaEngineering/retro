@@ -1,5 +1,6 @@
 import * as React from "react"
 import api from "./api";
+import LogoImg from "../static/images/retro.svg";
 
 class Landing extends React.Component<any, any> {
   constructor(props: object) {
@@ -37,7 +38,7 @@ class Landing extends React.Component<any, any> {
       <div>
         <div className="jumbotron row">
           <div className="col-md-2">
-            <img className="logo-landing" alt="Retro" src="../images/retro.svg"/>
+            <img className="logo-landing" alt="Retro" src={LogoImg}/>
           </div>
           <div className="col-md-10">
             <h2>Retro provides a space for collaborative retroactive meetings.</h2>

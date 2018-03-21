@@ -1,7 +1,7 @@
 import * as React from "react"
-
 import api from './api';
 import {Socket} from "phoenix"
+import LogoImg from "../static/images/retro.svg";
 
 class Room extends React.Component<any, any> {
   constructor(props: object) {
@@ -12,7 +12,6 @@ class Room extends React.Component<any, any> {
     this.state = {
       room: {
         id: null,
-        room: null,
         items: [],
         retro_day: null,
         retro_time: null
@@ -75,7 +74,7 @@ class Room extends React.Component<any, any> {
 
       //setup listener for when an item is archived
       this.channel.on("archive_item", payload => {
-        var room = this.state.room;
+        const room = this.state.room;
         room.items = this.state.room.items.filter(item => {
           if (item.id !== payload.item_id) {
             return item;
@@ -90,7 +89,7 @@ class Room extends React.Component<any, any> {
 
       //setup thumbs up listener
       this.channel.on("thumbs_up", payload => {
-        var room = this.state.room;
+        const room = this.state.room;
         room.items = this.state.room.items.map(item => {
           if (item.id === payload.item_id) {
             item.thumbs_up_count += 1;
@@ -127,18 +126,6 @@ class Room extends React.Component<any, any> {
     this.setState({[type]: event.target.value});
   }
 
-  changeRetroTime(event) {
-    let room = this.state.room;
-    room.retro_time = event.target.value;
-    this.setState({room: room});
-  }
-
-  selectRetroDay(day) {
-    let room = this.state.room;
-    room.retro_day = day;
-    this.setState({room: room});
-  }
-
   addItem(type: string) {
     this.channel.push(type, {body: this.state[type], room_id: this.state.room.id});
     this.setState({[type]: ""})
@@ -171,11 +158,9 @@ class Room extends React.Component<any, any> {
     });
   }
 
-  updateRoom(event) {
+  editRoom(event) {
     event.preventDefault();
-    api.put("/api/rooms/" + this.state.room.id, this.state.room).then((response) => {
-      this.setState({room: response.room})
-    });
+    this.props.history.push("/rooms/" + this.state.room.id + "/edit");
   }
 
   render() {
@@ -215,7 +200,7 @@ class Room extends React.Component<any, any> {
       <div>
         <div className="jumbotron row">
           <div className="col-md-2">
-            <img className="logo-landing" alt="Retro" src="../images/retro.svg"/>
+            <img className="logo-landing" alt="Retro" src={LogoImg}/>
           </div>
           <div className="col-md-10">
             <h2>{this.state.room.name}</h2>
@@ -229,33 +214,14 @@ class Room extends React.Component<any, any> {
                   <input type="text" className="form-control" placeholder="first@example.com, second@example.com"
                          value={this.state.emails} onChange={this.handleTextChange.bind(this, "emails")}/>
                 </div>
-                <button className="btn btn-primary"
-                        onClick={this.invite.bind(this)}>Send Invite Email</button>
-
-                <p>You can set up a time to send out an email reminder to those listed above for future meetings.
-                Choose a day and enter a military time (ex. 1620) that email reminders should be send out (America/Chicago).</p>
-                <div className="form-group col-md-2">
-                  <div className="btn-group">
-                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      {this.state.room.retro_day} <span className="caret"></span>
-                    </button>
-                    <ul className="dropdown-menu">
-                      <li onClick={this.selectRetroDay.bind(this, "Monday")}><a href="#">Monday</a></li>
-                      <li onClick={this.selectRetroDay.bind(this, "Tuesday")}><a href="#">Tuesday</a></li>
-                      <li onClick={this.selectRetroDay.bind(this, "Wednesday")}><a href="#">Wednesday</a></li>
-                      <li onClick={this.selectRetroDay.bind(this, "Thursday")}><a href="#">Thursday</a></li>
-                      <li onClick={this.selectRetroDay.bind(this, "Friday")}><a href="#">Friday</a></li>
-                      <li onClick={this.selectRetroDay.bind(this, "Saturday")}><a href="#">Saturday</a></li>
-                      <li onClick={this.selectRetroDay.bind(this, "Sunday")}><a href="#">Sunday</a></li>
-                    </ul>
-                  </div>
+                <div className="form-group">
+                  <button className="btn btn-primary"
+                          onClick={this.invite.bind(this)}>Send Invite Email</button>
                 </div>
-                <div className="form-group col-md-2">
-                  <input type="text" className="form-control" placeholder="1620"
-                         value={this.state.room.retro_time} onChange={this.changeRetroTime.bind(this)}/>
+                <div className="form-group">
+                  <button className="btn btn-primary"
+                          onClick={this.editRoom.bind(this)}>Retro Options</button>
                 </div>
-                <button className="btn btn-primary"
-                        onClick={this.updateRoom.bind(this)}>Update</button>
               </div>
             }
           </div>
