@@ -1,6 +1,6 @@
 import * as React from "react"
 import api from './api';
-import LogoImg from "../static/images/retro.svg";
+import Jumbotron from "./jumbtron";
 
 class NewRoom extends React.Component<any, any> {
   constructor(props: object) {
@@ -35,15 +35,11 @@ class NewRoom extends React.Component<any, any> {
     const errors = this.state.errors.map((error: string) => <div className="text-danger" key={error}>{error}</div>);
     return (
       <div>
-        <div className="jumbotron row">
-          <div className="col-md-2">
-            <img className="logo-landing" alt="Retro" src={LogoImg}/>
-          </div>
-          <div className="col-md-10">
-            <h2>Create a Retro for you and your friends.</h2>
-            <p>A Retro is a room for collaborative meetings. Choose a name and password to get started.</p>
-          </div>
-        </div>
+        {Jumbotron({
+          header: "Create a Retro for you and your friends.",
+          message: "A Retro is a room for collaborative meetings. Choose a name and password to get started."
+        })}
+
         <form onSubmit={this.handleSubmit} className="col-md-4 col-md-offset-4">
           <div>
             {errors}

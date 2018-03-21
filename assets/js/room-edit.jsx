@@ -1,6 +1,6 @@
 import * as React from "react"
 import api from './api';
-import LogoImg from "../static/images/retro.svg";
+import Jumbotron from "./jumbtron";
 
 class EditRoom extends React.Component<any, any> {
   constructor(props: object) {
@@ -62,7 +62,7 @@ class EditRoom extends React.Component<any, any> {
   render() {
     this.members = function () {
       return this.state.members.map((member: object) =>
-        <div className="thumbnail col-md-4 col-md-offset-4" key={member.id}>
+        <div className="list-group-item col-md-4 col-md-offset-4" key={member.id}>
           {member.email}
           <span className="pull-right">
             <a onClick={this.deleteMember.bind(this, member)} href="#">
@@ -75,15 +75,10 @@ class EditRoom extends React.Component<any, any> {
 
     return (
       <div>
-        <div className="jumbotron row">
-          <div className="col-md-2">
-            <img className="logo-landing" alt="Retro" src={LogoImg}/>
-          </div>
-          <div className="col-md-10">
-            <h2>{this.state.room.name}</h2>
-            <p>Customize your Retro below.</p>
-          </div>
-        </div>
+        {Jumbotron({
+          header: this.state.room.name,
+          message: "Customize your Retro below."
+        })}
 
         <h4 className="col-md-8 col-md-offset-2">
           You can set up a time to send out an email reminder to those listed below for future meetings.
@@ -117,7 +112,7 @@ class EditRoom extends React.Component<any, any> {
         <h4 className="col-md-8 col-md-offset-2">
           Below are the members of this Retro. They will receive an email at Retro time.
         </h4>
-        {this.members()}
+        <div className="list-group">{this.members()}</div>
       </div>
     )
   }

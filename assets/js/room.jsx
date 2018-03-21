@@ -1,7 +1,7 @@
 import * as React from "react"
 import api from './api';
 import {Socket} from "phoenix"
-import LogoImg from "../static/images/retro.svg";
+import Jumbotron from "./jumbtron";
 
 class Room extends React.Component<any, any> {
   constructor(props: object) {
@@ -198,34 +198,29 @@ class Room extends React.Component<any, any> {
     const actionItems = this.renderItems(this.state.actionItems, true);
     return (
       <div>
-        <div className="jumbotron row">
-          <div className="col-md-2">
-            <img className="logo-landing" alt="Retro" src={LogoImg}/>
+        {Jumbotron({
+          header: this.state.room.name,
+          message: <a onClick={this.showInvite.bind(this)} className="clickable">Invite others to this Retro</a>
+        })}
+        {this.state.showInvite &&
+        <div className="jumbotron">
+          <p>Invitations have been sent to: {this.memberEmails()}</p>
+          <div className="form-group">
+            <input type="text" className="form-control" placeholder="first@example.com, second@example.com"
+                   value={this.state.emails} onChange={this.handleTextChange.bind(this, "emails")}/>
           </div>
-          <div className="col-md-10">
-            <h2>{this.state.room.name}</h2>
-            <p>
-              <a onClick={this.showInvite.bind(this)} className="clickable">Invite others to this Retro</a>
-            </p>
-            {this.state.showInvite &&
-              <div>
-                <p>Invitations have been sent to: {this.memberEmails()}</p>
-                <div className="form-group">
-                  <input type="text" className="form-control" placeholder="first@example.com, second@example.com"
-                         value={this.state.emails} onChange={this.handleTextChange.bind(this, "emails")}/>
-                </div>
-                <div className="form-group">
-                  <button className="btn btn-primary"
-                          onClick={this.invite.bind(this)}>Send Invite Email</button>
-                </div>
-                <div className="form-group">
-                  <button className="btn btn-primary"
-                          onClick={this.editRoom.bind(this)}>Retro Options</button>
-                </div>
-              </div>
-            }
+          <div className="form-group">
+            <button className="btn btn-primary"
+                    onClick={this.invite.bind(this)}>Send Invite Email
+            </button>
+          </div>
+          <div className="form-group">
+            <button className="btn btn-primary"
+                    onClick={this.editRoom.bind(this)}>Retro Options
+            </button>
           </div>
         </div>
+        }
         <div className="row">
           <div className="retro-column">
             <div className="form-group">
