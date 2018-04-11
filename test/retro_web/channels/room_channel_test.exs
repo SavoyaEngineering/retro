@@ -57,35 +57,28 @@ defmodule RetroWeb.RoomChannelTest do
     end
   end
 
-  describe "when action is archive_item" do
-    test "broadcasts to room:room_id", %{socket: socket} do
-      push socket, "archive_item", %{"item_id" => 321}
-
-
-      assert_receive %Phoenix.Socket.Broadcast{
-        topic: "room:123",
-        event: "archive_item",
-        payload: %{item_id: 321}}
-    end
-
+  describe "when action is update_item" do
     test "broadcasts are pushed to the client", %{socket: socket} do
-      broadcast_from! socket, "archive_item", %{"item_id" => 321}
+      broadcast_from! socket, "update_item", %{"id" => 321}
 
 
-      assert_push "archive_item", %{"item_id" => 321}
+      assert_push "update_item", %{"id" => 321}
     end
 
-    test "archives the item", %{socket: socket} do
+    test "updates the item", %{socket: socket} do
       {:ok, item} = Item.create(%{text: "JH: New retro app.", type: "happy_msg", room_id: 12, archived: false})
 
 
-      broadcast_from! socket, "archive_item", %{"item_id" => item.id}
-      push socket, "archive_item", %{"item_id" => item.id}
+      broadcast_from! socket,
+                      "update_item",
+                      %{"id" => item.id, "text" => "JH: Old retro app.", "archived" => true}
+      push socket, "update_item", %{"id" => item.id, "text" => "JH: Old retro app.", "archived" => true}
 
 
       Process.sleep(10) #this sleep has to be here as the process is async and takes some amount of time
       updated_item = Repo.get(Item, item.id)
       assert updated_item.archived === true
+      assert updated_item.text === "JH: Old retro app."
     end
   end
 

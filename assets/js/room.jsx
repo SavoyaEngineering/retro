@@ -31,7 +31,7 @@ class Room extends React.Component<any, any> {
 
     this.itemsForColumn = function (type: string) {
       return this.state.room.items.filter(item => {
-        return item.type === type;
+        return item.type === type && !item.archived;
       });
     };
 
@@ -73,14 +73,15 @@ class Room extends React.Component<any, any> {
       });
 
       //setup listener for when an item is archived
-      this.channel.on("archive_item", payload => {
+      this.channel.on("update_item", updatedItem => {
         const room = this.state.room;
-        room.items = this.state.room.items.filter(item => {
-          if (item.id !== payload.item_id) {
+        room.items = this.state.room.items.map(item => {
+          if (item.id !== updatedItem.id) {
             return item;
+          } else {
+            return updatedItem
           }
         });
-
         this.setState({
           room: room
         });
@@ -137,7 +138,8 @@ class Room extends React.Component<any, any> {
   };
 
   archiveItem(item) {
-    this.channel.push("archive_item", {item_id: item.id});
+    item.archived = true;
+    this.channel.push("update_item", item);
   };
 
   thumbsUp(item, event) {

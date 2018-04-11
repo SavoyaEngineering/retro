@@ -14,15 +14,18 @@ defmodule RetroWeb.RoomChannel do
   end
 
   def handle_in("select_item" = action, %{"item_id" => id}, socket) do
-    broadcast_item_change(action, id, socket)
+    broadcast_item_change(action, %{item_id: id}, socket)
   end
 
-  def handle_in("archive_item" = action, %{"item_id" => id}, socket) do
-    if item = Repo.get(Item, id) do
-      Item.archive(item)
+  def handle_in("update_item" = action, msg_payload, socket) do
+    if item = Repo.get(Item, msg_payload["id"]) do
+      {:ok, updated_item} =
+        Ecto.Changeset.change(item, %{text: msg_payload["text"], archived: msg_payload["archived"]})
+        |> Repo.update
+       broadcast_item_change(
+         action, Item.as_json(updated_item), socket
+      )
     end
-
-    broadcast_item_change(action, id, socket)
   end
 
   def handle_in("thumbs_up" = action, %{"item_id" => id}, socket) do
@@ -31,11 +34,11 @@ defmodule RetroWeb.RoomChannel do
       |> Repo.update
     end
 
-    broadcast_item_change(action, id, socket)
+    broadcast_item_change(action, %{item_id: id}, socket)
   end
 
-  defp broadcast_item_change(action, id, socket) do
-    broadcast!(socket, action, %{item_id: id})
+  defp broadcast_item_change(action, payload, socket) do
+    broadcast!(socket, action, payload)
     {:noreply, socket}
   end
 end
