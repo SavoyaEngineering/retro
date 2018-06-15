@@ -72,7 +72,7 @@ class Room extends React.Component<any, any> {
         this.setupColumnItems(this);
       });
 
-      //setup listener for when an item is archived
+      //setup listener for when an item is updated
       this.channel.on("update_item", updatedItem => {
         const room = this.state.room;
         room.items = this.state.room.items.map(item => {
@@ -123,8 +123,18 @@ class Room extends React.Component<any, any> {
     this.getMembers();
   }
 
-  handleTextChange(type: string, event) {
+  handleInputChange(type: string, event) {
     this.setState({[type]: event.target.value});
+  }
+
+  handleTextChange(item, event) {
+    this.state.room.items.map(listItem => {
+      if(item.id === listItem.id) {
+        return listItem.text = event.target.value;
+      }
+    });
+
+    this.setupColumnItems(this);
   }
 
   addItem(type: string) {
@@ -145,6 +155,25 @@ class Room extends React.Component<any, any> {
   thumbsUp(item, event) {
     event.preventDefault();
     this.channel.push("thumbs_up", {item_id: item.id})
+  }
+
+  editing(item, editable, event) {
+    if(event) {
+      event.preventDefault();
+    }
+    this.state.room.items.map(listItem => {
+      if(item.id === listItem.id) {
+        listItem.editable = editable;
+      }
+    });
+
+    this.setupColumnItems(this);
+  }
+
+  saveEdit(item, event) {
+    event.preventDefault();
+    this.channel.push("update_item", item);
+    this.editing(item, false)
   }
 
   showInvite(event) {
@@ -169,19 +198,31 @@ class Room extends React.Component<any, any> {
     this.renderItems = function (items, skipThumbsUp) {
       return items.map((item: object) =>
         <div className="thumbnail" key={item.id}>
-          <div className={item.selected ? "caption selected-item" : "caption"} id={item.id}>
+          {item.editable ? (
+            <div>
+              <textarea className="form-control" placeholder="New text"
+                     value={item.text} onChange={this.handleTextChange.bind(this, item)}/>
+              <button className="btn-sm btn-secondary"
+                      onClick={this.saveEdit.bind(this, item)}>Save</button>
+            </div>
+          ) :
+          (<div className={item.selected ? "caption selected-item" : "caption"} id={item.id}>
             <a onClick={this.focusItem.bind(this, item)} className="center-block" href="#">
               {item.text}
             </a>
             {(!item.selected && !skipThumbsUp) &&
-            <button className="btn-sm btn-secondary"
-                    onClick={this.thumbsUp.bind(this, item)}>+{item.thumbs_up_count}</button>
+              <div>
+                <button className="btn-sm btn-secondary"
+                        onClick={this.thumbsUp.bind(this, item)}>+{item.thumbs_up_count}</button>
+                <button className="btn-sm btn-secondary"
+                        onClick={this.editing.bind(this, item, true)}>Edit</button>
+              </div>
             }
             {item.selected &&
             <button className="btn btn-primary"
                     onClick={this.archiveItem.bind(this, item)}>Archive</button>
             }
-          </div>
+          </div>)}
         </div>
       )
     };
@@ -209,7 +250,7 @@ class Room extends React.Component<any, any> {
           <p>Invitations have been sent to: {this.memberEmails()}</p>
           <div className="form-group">
             <input type="text" className="form-control" placeholder="first@example.com, second@example.com"
-                   value={this.state.emails} onChange={this.handleTextChange.bind(this, "emails")}/>
+                   value={this.state.emails} onChange={this.handleInputChange.bind(this, "emails")}/>
           </div>
           <div className="form-group">
             <button className="btn btn-primary"
@@ -227,7 +268,7 @@ class Room extends React.Component<any, any> {
           <div className="retro-column">
             <div className="form-group">
               <input type="text" className="form-control" placeholder="Something happy"
-                value={this.state.happy_msg} onChange={this.handleTextChange.bind(this, "happy_msg")}/>
+                value={this.state.happy_msg} onChange={this.handleInputChange.bind(this, "happy_msg")}/>
             </div>
             <button className="btn btn-primary"
                     onClick={this.addItem.bind(this, "happy_msg")}>Add Item</button>
@@ -237,7 +278,7 @@ class Room extends React.Component<any, any> {
           <div className="retro-column">
             <div className="form-group">
               <input type="text" className="form-control" placeholder="Something meh"
-                     value={this.state.middle_msg} onChange={this.handleTextChange.bind(this, "middle_msg")}/>
+                     value={this.state.middle_msg} onChange={this.handleInputChange.bind(this, "middle_msg")}/>
             </div>
             <button className="btn btn-primary"
                     onClick={this.addItem.bind(this, "middle_msg")}>Add Item</button>
@@ -247,7 +288,7 @@ class Room extends React.Component<any, any> {
           <div className="retro-column">
             <div className="form-group">
               <input type="text" className="form-control" placeholder="Something sad"
-                     value={this.state.sad_msg} onChange={this.handleTextChange.bind(this, "sad_msg")}/>
+                     value={this.state.sad_msg} onChange={this.handleInputChange.bind(this, "sad_msg")}/>
             </div>
             <button className="btn btn-primary"
                     onClick={this.addItem.bind(this, "sad_msg")}>Add Item</button>
@@ -260,7 +301,7 @@ class Room extends React.Component<any, any> {
           <h3>Action Items</h3>
           <div className="form-group">
             <textarea type="text" className="form-control" placeholder="What do we need to remember to do next week?"
-                   value={this.state.action_msg} onChange={this.handleTextChange.bind(this, "action_msg")}/>
+                   value={this.state.action_msg} onChange={this.handleInputChange.bind(this, "action_msg")}/>
           </div>
           <button className="btn btn-primary"
                   onClick={this.addItem.bind(this, "action_msg")}>Add Action Item</button>
