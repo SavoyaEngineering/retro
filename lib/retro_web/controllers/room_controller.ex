@@ -65,6 +65,7 @@ defmodule RetroWeb.RoomController do
             name: room.name,
             retro_day: room.retro_day,
             retro_time: room.retro_time,
+            slack_hook_address: room.slack_hook_address,
             socket_token: AuthHelper.get_socket_token(conn, room.id),
             items: items_for_room(room),
           }
@@ -79,7 +80,14 @@ defmodule RetroWeb.RoomController do
     room = Repo.get(Room, params["id"])
     if room.id === AuthHelper.current_room_for_conn(conn) do
       {:ok, updated_room} =
-        Ecto.Changeset.change(room, %{retro_day: params["retro_day"], retro_time: params["retro_time"]})
+        Ecto.Changeset.change(
+          room,
+          %{
+            retro_day: params["retro_day"],
+            retro_time: params["retro_time"],
+            slack_hook_address: params["slack_hook_address"]
+          }
+        )
         |> Repo.update
 
       json(
@@ -90,6 +98,7 @@ defmodule RetroWeb.RoomController do
             name: updated_room.name,
             retro_day: updated_room.retro_day,
             retro_time: updated_room.retro_time,
+            slack_hook_address: updated_room.slack_hook_address,
           }
         }
       )

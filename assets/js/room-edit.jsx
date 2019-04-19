@@ -11,7 +11,8 @@ class EditRoom extends React.Component<any, any> {
       room: {
         id: null,
         retro_day: "",
-        retro_time: ""
+        retro_time: "",
+        slack_hook_address: ""
       },
       members: []
     };
@@ -37,6 +38,12 @@ class EditRoom extends React.Component<any, any> {
   changeRetroTime(event) {
     let room = this.state.room;
     room.retro_time = event.target.value;
+    this.setState({room: room});
+  }
+
+  changeSlackHook(event) {
+    let room = this.state.room;
+    room.slack_hook_address = event.target.value;
     this.setState({room: room});
   }
 
@@ -103,6 +110,18 @@ class EditRoom extends React.Component<any, any> {
         <div className="form-group col-md-2">
           <input type="text" className="form-control" placeholder="1620"
                  value={this.state.room.retro_time} onChange={this.changeRetroTime.bind(this)}/>
+        </div>
+        <div className="form-group col-md-5">
+          <button className="btn btn-primary"
+                  onClick={this.updateRoom.bind(this)}>Update</button>
+        </div>
+
+        <h4 className="col-md-8 col-md-offset-2">
+          If you want Slack integration with an alert sent to the channel, you can give us the webhook to send to.
+        </h4>
+        <div className="form-group col-md-offset-3 col-md-4">
+          <input type="text" className="form-control"
+                 value={this.state.room.slack_hook_address} onChange={this.changeSlackHook.bind(this)}/>
         </div>
         <div className="form-group col-md-5">
           <button className="btn btn-primary"

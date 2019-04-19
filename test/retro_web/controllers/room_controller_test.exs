@@ -155,10 +155,8 @@ defmodule RetroWeb.RoomControllerTest do
   end
 
   describe "PUT /rooms/:id" do
-    test "it can update retro_day and retro_time", %{conn: conn} do
-      {:ok, room} = Room.create(
-        %{name: "Dev Retro", password: "bethcatlover", retro_day: "Friday", retro_time: "1100"}
-      )
+    test "it can update retro_day, retro_time, slack_hook_address", %{conn: conn} do
+      {:ok, room} = Room.create(%{name: "Dev Retro", password: "bethcatlover"})
 
       #setup the connection signed into that room
       {:ok, token, _} = RetroWeb.Guardian.encode_and_sign(room)
@@ -167,7 +165,14 @@ defmodule RetroWeb.RoomControllerTest do
              |> put_req_header("authorization", "Bearer: #{token}")
 
 
-      conn = put conn, "api/rooms/#{room.id}", %{retro_day: "Saturday", retro_time: "1200", name: "can't update"}
+      conn = put conn,
+                 "api/rooms/#{room.id}",
+                 %{
+                   retro_day: "Saturday",
+                   retro_time: "1200",
+                   slack_hook_address: "www.faker.com",
+                   name: "can't update"
+                 }
 
 
       response = json_response(conn, 200)
@@ -176,6 +181,7 @@ defmodule RetroWeb.RoomControllerTest do
       assert room_response["name"] === "Dev Retro"
       assert room_response["retro_time"] === "1200"
       assert room_response["retro_day"] === "Saturday"
+      assert room_response["slack_hook_address"] === "www.faker.com"
     end
   end
 end

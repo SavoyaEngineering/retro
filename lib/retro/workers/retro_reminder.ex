@@ -3,7 +3,7 @@ defmodule Retro.RetroReminder do
   use Timex
   import Ecto.Query, only: [from: 2]
 
-  alias Retro.{Repo, Room, Member, Mailer}
+  alias Retro.{Repo, Room, Member, Mailer, SlackAlerter}
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok)
@@ -31,6 +31,10 @@ defmodule Retro.RetroReminder do
                       where: member.room_id == ^room.id,
                       select: member.email
       Mailer.send_join_room_email(Repo.all(email_query), room.temporary_token)
+
+      if room.slack_hook_address do
+        SlackAlerter.alert(room.slack_hook_address, room.temporary_token)
+      end
     end)
 
     Process.send_after(self(), :remind, 60 * 1000) # In 1 minute
