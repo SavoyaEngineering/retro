@@ -32,9 +32,9 @@ defmodule Retro.RetroReminder do
                       select: member.email
       Mailer.send_join_room_email(Repo.all(email_query), room.temporary_token)
 
-#      if room.slack_hook_address do
-#        SlackAlerter.alert(room.slack_hook_address, room.temporary_token)
-#      end
+      if room.slack_hook_address do
+        SlackAlerter.alert(room.slack_hook_address, room.temporary_token)
+      end
     end)
 
     Process.send_after(self(), :remind, 60 * 1000) # In 1 minute
